@@ -1,24 +1,19 @@
 package toorla.ast.expression;
 
-import toorla.ast.expression.value.IntValue;
 import toorla.types.singleType.SingleType;
 import toorla.visitor.Visitor;
 
 public class NewArray extends Expression {
-    private IntValue length;
+    private Expression length;
     private SingleType type;
 
-    public NewArray(SingleType type, IntValue length) {
+    public NewArray(SingleType type, Expression length) {
         this.length = length;
         this.type = type;
     }
 
-    public IntValue getLength() {
+    public Expression getLength() {
         return length;
-    }
-
-    public void setLength(IntValue length) {
-        this.length = length;
     }
 
     public SingleType getType() {
