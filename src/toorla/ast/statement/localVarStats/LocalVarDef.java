@@ -25,15 +25,9 @@ public class LocalVarDef extends Statement {
         return initialValue;
     }
 
-    public void setInitialValue(Expression initialValue) {
-        this.initialValue = initialValue;
-    }
 
     public Identifier getLocalVarName() {
         return localVarName;
     }
 
-    public void setLocalVarName(Identifier localVarName ) {
-        this.localVarName = localVarName;
-    }
 }

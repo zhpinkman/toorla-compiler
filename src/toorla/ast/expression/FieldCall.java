@@ -5,7 +5,7 @@ import toorla.visitor.Visitor;
 public class FieldCall extends Expression {
     private Expression instance;
     private Identifier field;
-    public FieldCall( Expression instance , Identifier field )
+    public FieldCall(Expression instance , Identifier field )
     {
         this.instance = instance;
         this.field = field;
@@ -15,17 +15,11 @@ public class FieldCall extends Expression {
         return instance;
     }
 
-    public void setInstance(Expression instance) {
-        this.instance = instance;
-    }
 
     public Identifier getField() {
         return field;
     }
 
-    public void setField(Identifier field) {
-        this.field = field;
-    }
 
     @Override
     public <R> R accept(Visitor<R> visitor) {

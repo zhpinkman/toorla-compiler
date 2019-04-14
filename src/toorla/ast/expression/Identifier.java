@@ -13,10 +13,6 @@ public class Identifier extends Expression {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);
     }

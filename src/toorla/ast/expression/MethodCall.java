@@ -19,17 +19,11 @@ public class MethodCall extends Expression {
         return instance;
     }
 
-    public void setInstance(Expression instance) {
-        this.instance = instance;
-    }
 
     public Identifier getMethodName() {
         return methodName;
     }
 
-    public void setMethodName(Identifier methodName) {
-        this.methodName = methodName;
-    }
 
     public ArrayList<Expression> getArgs() {
         return args;

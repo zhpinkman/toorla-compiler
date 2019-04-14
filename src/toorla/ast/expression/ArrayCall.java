@@ -15,16 +15,8 @@ public class ArrayCall extends Expression {
         return index;
     }
 
-    public void setIndex(Expression index) {
-        this.index = index;
-    }
-
     public Expression getInstance() {
         return instance;
-    }
-
-    public void setInstance(Expression instance) {
-        this.instance = instance;
     }
 
     @Override

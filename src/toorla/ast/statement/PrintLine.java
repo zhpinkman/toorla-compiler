@@ -14,10 +14,6 @@ public class PrintLine extends Statement {
         return arg;
     }
 
-    public void setArg(Expression arg) {
-        this.arg = arg;
-    }
-
 	public <R> R accept(Visitor<R> visitor) {
 		return visitor.visit(this);
 	}

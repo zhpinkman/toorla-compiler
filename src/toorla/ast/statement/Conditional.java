@@ -11,7 +11,7 @@ public class Conditional extends Statement {
     public Conditional(Expression condition, Statement thenStmt) {
         this.condition = condition;
         this.thenStmt = thenStmt;
-        this.elseStmt = null;
+        this.elseStmt = new Skip();
     }
 
     public Conditional(Expression condition, Statement thenStmt, Statement elseStmt) {
@@ -20,9 +20,6 @@ public class Conditional extends Statement {
         this.elseStmt = elseStmt;
     }
 
-    public void setElseStatement(Statement elze) {
-        this.elseStmt = elze;
-    }
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);

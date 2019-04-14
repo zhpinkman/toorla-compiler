@@ -41,9 +41,6 @@ public class MethodDeclaration extends Declaration implements ClassMemberDeclara
         return name;
     }
 
-    public void setName(Identifier name) {
-        this.name = name;
-    }
 
     public ArrayList<ParameterDeclaration> getArgs() {
         return args;

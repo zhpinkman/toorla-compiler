@@ -15,9 +15,6 @@ public class Return extends Statement {
         return returnedExpr;
     }
 
-    public void setReturnedExpr(Expression returnedExpr) {
-        this.returnedExpr = returnedExpr;
-    }
     @Override
     public <R> R accept( Visitor<R> visitor )
     {

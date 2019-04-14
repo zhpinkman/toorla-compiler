@@ -16,17 +16,11 @@ public class Assign extends Statement {
 		return rvalue;
 	}
 
-	public void setRvalue(Expression rvalue) {
-		this.rvalue = rvalue;
-	}
 
 	public Expression getLvalue() {
 		return lvalue;
 	}
 
-	public void setLvalue(Expression lvalue) {
-		this.lvalue = lvalue;
-	}
 	public <R> R accept(Visitor<R> visitor) {
 		return visitor.visit(this);
 	}

@@ -24,7 +24,4 @@ public class IncStatement extends Statement {
         return operand;
     }
 
-    public void setOperand(Expression operand) {
-        this.operand = operand;
-    }
 }
