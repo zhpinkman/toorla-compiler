@@ -1,1 +1,1 @@
-# This project is provided code of Toorla language's compiler.
+# This project is provided code for Toorla language's compiler.
