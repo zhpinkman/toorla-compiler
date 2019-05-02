@@ -8,7 +8,7 @@ import toorla.visitor.Visitor;
 public class LocalVarDef extends Statement {
     private Identifier localVarName;
     private Expression initialValue;
-    public LocalVarDef( Identifier localVarName , Expression initialValue )
+    public LocalVarDef(Identifier localVarName , Expression initialValue )
     {
         this.localVarName = localVarName;
         this.initialValue = initialValue;

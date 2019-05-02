@@ -334,6 +334,11 @@ public class TreePrinter implements Visitor<Void> {
     @Override
     public Void visit(ClassDeclaration classDeclaration) {
         System.out.print("(class ");
+        printClassBody(classDeclaration);
+        return null;
+    }
+
+    private void printClassBody(ClassDeclaration classDeclaration) {
         classDeclaration.getName().accept(this);
         System.out.print(" ");
         if (classDeclaration.getParentName().getName() != null) {
@@ -343,21 +348,12 @@ public class TreePrinter implements Visitor<Void> {
         for (ClassMemberDeclaration md : classDeclaration.getClassMembers())
             md.accept(this);
         System.out.println(")");
-        return null;
     }
 
     @Override
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
         System.out.print("( entry class ");
-        entryClassDeclaration.getName().accept(this);
-        System.out.print(" ");
-        if (entryClassDeclaration.getParentName().getName() != null) {
-            entryClassDeclaration.getParentName().accept(this);
-            System.out.print(" ");
-        }
-        for (ClassMemberDeclaration md : entryClassDeclaration.getClassMembers())
-            md.accept(this);
-        System.out.println(")");
+        printClassBody(entryClassDeclaration);
         return null;
     }
 

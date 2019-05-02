@@ -4,8 +4,7 @@ import toorla.symbolTable.exceptions.ItemAlreadyExistsException;
 import toorla.symbolTable.exceptions.ItemNotFoundException;
 import toorla.symbolTable.symbolTableItem.SymbolTableItem;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SymbolTable {
     private SymbolTable pre;
@@ -13,17 +12,26 @@ public class SymbolTable {
 
     // Static members region
 
-    public static SymbolTable top;
+    private static SymbolTable top;
     public static SymbolTable root;
 
-    private static Stack<SymbolTable> stack = new Stack<SymbolTable>();
+    private static Stack<SymbolTable> stack = new Stack<>();
+    private static Queue<SymbolTable> queue = new LinkedList<>();
+
+    public static SymbolTable top() {
+        return top;
+    }
+
+    public static void pushFromQueue() {
+        push(queue.remove());
+    }
 
     public static void push(SymbolTable symbolTable) {
         if (top != null)
             stack.push(top);
         top = symbolTable;
+        queue.offer(symbolTable);
     }
-
 
     public static void pop() {
         top = stack.pop();
@@ -46,28 +54,33 @@ public class SymbolTable {
         items.put(item.getKey(), item);
     }
 
-
     public SymbolTableItem get(String key) throws ItemNotFoundException {
-        SymbolTableItem value = items.get(key);
-        if (value == null && pre != null)
-            return pre.get(key);
-        else if (value == null)
-            throw new ItemNotFoundException();
-        else
-            return value;
+        Set<SymbolTable> visitedSymbolTables = new HashSet<>();
+        SymbolTable currentSymbolTable = this;
+        do {
+            visitedSymbolTables.add( currentSymbolTable );
+            SymbolTableItem value = currentSymbolTable.items.get(key);
+            if (value == null )
+                currentSymbolTable = currentSymbolTable.getPreSymbolTable();
+            else
+                return value;
+        } while( currentSymbolTable != null &&
+                !visitedSymbolTables.contains( currentSymbolTable ) );
+        throw new ItemNotFoundException();
     }
 
-    public void updateItemInCurrentScope(String prevKey, SymbolTableItem newItem) throws ItemNotFoundException {
-        SymbolTableItem value = items.get(prevKey);
-        if (value == null)
+    public SymbolTableItem getInParentScopes(String key) throws ItemNotFoundException {
+        if (pre == null)
             throw new ItemNotFoundException();
-        else {
-            items.remove(prevKey);
-            items.put(newItem.getKey(), newItem);
-        }
+        else
+            return pre.get(key);
     }
 
     public SymbolTable getPreSymbolTable() {
         return pre;
+    }
+
+    public void setPreSymbolTable(SymbolTable symbolTable) {
+        pre = symbolTable;
     }
 }

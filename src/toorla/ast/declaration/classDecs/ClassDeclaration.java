@@ -31,10 +31,14 @@ public class ClassDeclaration extends Declaration {
         return name;
     }
 
+    public void setName(Identifier name) {
+        this.name = name;
+    }
 
     public Identifier getParentName() {
         return parentName;
     }
+
 
     public ArrayList<ClassMemberDeclaration> getClassMembers() {
         return members;

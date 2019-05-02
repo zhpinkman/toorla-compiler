@@ -44,12 +44,12 @@ classDeclaration[ boolean isEntry ]
 	{
 	    Identifier className = new Identifier( $n.text );
 	    Identifier parentName = new Identifier(null);
-        setNodePosition( className , $n.getLine() , $n.getCharPositionInLine() );
-        if( $p != null && $p.text != null )
-        {
-            parentName = new Identifier($p.text);
-            setNodePosition( parentName , $p.getLine() , $p.getCharPositionInLine() );
-        }
+	    setNodePosition( className , $n.getLine() , $n.getCharPositionInLine() );
+	    if( $p != null && $p.text != null )
+	    {
+	        parentName = new Identifier($p.text);
+	        setNodePosition( parentName , $p.getLine() , $p.getCharPositionInLine() );
+	    }
 	    if( isEntry )
 	        $mClass=new EntryClassDeclaration( className , parentName );
         else

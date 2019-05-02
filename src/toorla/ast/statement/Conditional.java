@@ -20,7 +20,6 @@ public class Conditional extends Statement {
         this.elseStmt = elseStmt;
     }
 
-
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);
     }

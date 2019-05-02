@@ -14,9 +14,6 @@ public class NewClassInstance extends Expression {
         return className;
     }
 
-    public void setClassName(Identifier className) {
-        this.className = className;
-    }
 
     @Override
     public String toString() {
