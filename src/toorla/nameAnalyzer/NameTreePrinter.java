@@ -20,9 +20,7 @@ public class NameTreePrinter extends TreePrinter {
     @Override
     public Void visit(Program program) {
         SymbolTable.pushFromQueue();
-        for (ClassDeclaration cd : program.getClasses()) {
-            cd.accept(this);
-        }
+        super.visit( program );
         SymbolTable.pop();
         return null;
     }
