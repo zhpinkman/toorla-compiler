@@ -1,5 +1,6 @@
 package toorla.ast.expression.value;
 
+import toorla.symbolTable.SymbolTable;
 import toorla.types.Type;
 import toorla.types.singleType.StringType;
 import toorla.visitor.Visitor;
@@ -32,6 +33,11 @@ public class StringValue extends Value {
     @Override
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit( this );
+    }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        return new StringType();
     }
 
 }

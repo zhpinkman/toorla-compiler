@@ -17,219 +17,249 @@ import toorla.ast.statement.*;
 import toorla.ast.statement.localVarStats.LocalVarDef;
 import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
+import toorla.typeChecking.typeCheckExceptions.IllegalLoopStatementActions;
+import toorla.types.Type;
 import toorla.visitor.Visitor;
 
-public class TypeChecking implements Visitor<Void> {
+public class TypeChecking implements Visitor<Type> {
+
+    public static int loop_depth;
+
+    public TypeChecking(){
+        loop_depth = 0;
+    }
 
     @Override
-    public Void visit(PrintLine printStat) {
-//        printStat.
+    public Type visit(PrintLine printStat) {
+
 
         return null;
     }
 
     @Override
-    public Void visit(Assign assignStat) {
+    public Type visit(Assign assignStat) {
         return null;
     }
 
     @Override
-    public Void visit(Block block) {
+    public Type visit(Block block) {
         return null;
     }
 
     @Override
-    public Void visit(Conditional conditional) {
+    public Type visit(Conditional conditional) {
         return null;
     }
 
     @Override
-    public Void visit(While whileStat) {
+    public Type visit(While whileStat) {
+        loop_depth ++;
+        try{
+            whileStat.expr.accept(this);
+        }
+        catch (Exception exception){
+            //
+        }
+        try{
+            whileStat.body.accept(this);
+        }
+        catch (Exception exception){
+            //
+        }
+        loop_depth --;
         return null;
     }
 
     @Override
-    public Void visit(Return returnStat) {
+    public Type visit(Return returnStat) {
         return null;
     }
 
     @Override
-    public Void visit(Break breakStat) {
+    public Type visit(Break breakStat) {
         return null;
     }
 
     @Override
-    public Void visit(Continue continueStat) {
+    public Type visit(Continue continueStat) {
+        try{
+            if (loop_depth == 0){
+                throw new IllegalLoopStatementActions(continueStat.line, continueStat.col, "continue");
+            }
+        }
+        catch(Exception exception){
+            //
+        }
         return null;
     }
 
     @Override
-    public Void visit(Skip skip) {
+    public Type visit(Skip skip) {
         return null;
     }
 
     @Override
-    public Void visit(LocalVarDef localVarDef) {
+    public Type visit(LocalVarDef localVarDef) {
         return null;
     }
 
     @Override
-    public Void visit(IncStatement incStatement) {
+    public Type visit(IncStatement incStatement) {
         return null;
     }
 
     @Override
-    public Void visit(DecStatement decStatement) {
+    public Type visit(DecStatement decStatement) {
         return null;
     }
 
     @Override
-    public Void visit(Plus plusExpr) {
+    public Type visit(Plus plusExpr) {
         return null;
     }
 
     @Override
-    public Void visit(Minus minusExpr) {
+    public Type visit(Minus minusExpr) {
         return null;
     }
 
     @Override
-    public Void visit(Times timesExpr) {
+    public Type visit(Times timesExpr) {
         return null;
     }
 
     @Override
-    public Void visit(Division divExpr) {
+    public Type visit(Division divExpr) {
         return null;
     }
 
     @Override
-    public Void visit(Modulo moduloExpr) {
+    public Type visit(Modulo moduloExpr) {
         return null;
     }
 
     @Override
-    public Void visit(Equals equalsExpr) {
+    public Type visit(Equals equalsExpr) {
         return null;
     }
 
     @Override
-    public Void visit(GreaterThan gtExpr) {
+    public Type visit(GreaterThan gtExpr) {
         return null;
     }
 
     @Override
-    public Void visit(LessThan lessThanExpr) {
+    public Type visit(LessThan lessThanExpr) {
         return null;
     }
 
     @Override
-    public Void visit(And andExpr) {
+    public Type visit(And andExpr) {
         return null;
     }
 
     @Override
-    public Void visit(Or orExpr) {
+    public Type visit(Or orExpr) {
         return null;
     }
 
     @Override
-    public Void visit(Neg negExpr) {
+    public Type visit(Neg negExpr) {
         return null;
     }
 
     @Override
-    public Void visit(Not notExpr) {
+    public Type visit(Not notExpr) {
         return null;
     }
 
     @Override
-    public Void visit(MethodCall methodCall) {
+    public Type visit(MethodCall methodCall) {
         return null;
     }
 
     @Override
-    public Void visit(Identifier identifier) {
+    public Type visit(Identifier identifier) {
         return null;
     }
 
     @Override
-    public Void visit(Self self) {
+    public Type visit(Self self) {
         return null;
     }
 
     @Override
-    public Void visit(IntValue intValue) {
+    public Type visit(IntValue intValue) {
         return null;
     }
 
     @Override
-    public Void visit(NewArray newArray) {
+    public Type visit(NewArray newArray) {
         return null;
     }
 
     @Override
-    public Void visit(BoolValue booleanValue) {
+    public Type visit(BoolValue booleanValue) {
         return null;
     }
 
     @Override
-    public Void visit(StringValue stringValue) {
+    public Type visit(StringValue stringValue) {
         return null;
     }
 
     @Override
-    public Void visit(NewClassInstance newClassInstance) {
+    public Type visit(NewClassInstance newClassInstance) {
         return null;
     }
 
     @Override
-    public Void visit(FieldCall fieldCall) {
+    public Type visit(FieldCall fieldCall) {
         return null;
     }
 
     @Override
-    public Void visit(ArrayCall arrayCall) {
+    public Type visit(ArrayCall arrayCall) {
         return null;
     }
 
     @Override
-    public Void visit(NotEquals notEquals) {
+    public Type visit(NotEquals notEquals) {
         return null;
     }
 
     @Override
-    public Void visit(ClassDeclaration classDeclaration) {
+    public Type visit(ClassDeclaration classDeclaration) {
         return null;
     }
 
     @Override
-    public Void visit(EntryClassDeclaration entryClassDeclaration) {
+    public Type visit(EntryClassDeclaration entryClassDeclaration) {
         return null;
     }
 
     @Override
-    public Void visit(FieldDeclaration fieldDeclaration) {
+    public Type visit(FieldDeclaration fieldDeclaration) {
         return null;
     }
 
     @Override
-    public Void visit(ParameterDeclaration parameterDeclaration) {
+    public Type visit(ParameterDeclaration parameterDeclaration) {
         return null;
     }
 
     @Override
-    public Void visit(MethodDeclaration methodDeclaration) {
+    public Type visit(MethodDeclaration methodDeclaration) {
         return null;
     }
 
     @Override
-    public Void visit(LocalVarsDefinitions localVarsDefinitions) {
+    public Type visit(LocalVarsDefinitions localVarsDefinitions) {
         return null;
     }
 
     @Override
-    public Void visit(Program program) {
+    public Type visit(Program program) {
         return null;
     }
 }
