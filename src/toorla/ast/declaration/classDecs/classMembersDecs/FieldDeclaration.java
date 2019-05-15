@@ -6,6 +6,7 @@ import toorla.symbolTable.SymbolTable;
 import toorla.typeChecking.typeCheckExceptions.InvalidClassName;
 import toorla.typeChecking.typeCheckExceptions.TypeCheckException;
 import toorla.types.Type;
+import toorla.types.singleType.VoidType;
 import toorla.visitor.Visitor;
 
 import javax.sound.midi.SysexMessage;
@@ -55,8 +56,14 @@ public class FieldDeclaration extends TypedVariableDeclaration implements ClassM
     @Override
     public Type type_check(SymbolTable symbolTable) {
         try {
-//            System.out.println(this.type.);
-            SymbolTable.top().get("class_sss");
+            String type_name;
+            String hard_type = this.type.toString();
+            System.out.println(hard_type);
+            if (hard_type == "(IntType)" || hard_type == "(BoolType)" || hard_type == "(StringType)")
+                return new VoidType();
+            int index_of_name = hard_type.indexOf(',');
+            type_name = hard_type.substring(index_of_name + 1, hard_type.length() - 1);
+            SymbolTable.top().get("class_" + type_name);
             System.out.println("hoooray");
         }
         catch (Exception exception){

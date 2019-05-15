@@ -1,6 +1,6 @@
 entry class aaa:
     //public field a int;
-    publid field b sss;
+    public field b string;
 
 end
 

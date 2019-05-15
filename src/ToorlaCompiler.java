@@ -16,5 +16,6 @@ public class ToorlaCompiler {
         System.out.println("zzz");
         toorlaASTCode.type_check(SymbolTable.root);
 
+
     }
 }
