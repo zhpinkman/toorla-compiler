@@ -55,19 +55,17 @@ public class FieldDeclaration extends TypedVariableDeclaration implements ClassM
 
     @Override
     public Type type_check(SymbolTable symbolTable) {
+        String type_name = "";
+        String hard_type = this.type.toString();
         try {
-            String type_name;
-            String hard_type = this.type.toString();
-            System.out.println(hard_type);
             if (hard_type == "(IntType)" || hard_type == "(BoolType)" || hard_type == "(StringType)")
                 return new VoidType();
             int index_of_name = hard_type.indexOf(',');
             type_name = hard_type.substring(index_of_name + 1, hard_type.length() - 1);
             SymbolTable.top().get("class_" + type_name);
-            System.out.println("hoooray");
         }
         catch (Exception exception){
-            System.out.println("ahhh");
+            System.out.println("Error:Line:" + line + ":" + "There is no type with name " + type_name);
         }
         return null;
     }

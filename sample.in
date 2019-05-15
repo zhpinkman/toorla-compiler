@@ -1,10 +1,16 @@
-entry class aaa:
-    //public field a int;
-    public field b string;
+entry class Test :
+    public field temp_length bool;
 
+    public function main() returns zhivar :
+        var a = 3;
+        begin
+            var a = 2;
+            begin
+                var a1 = 2;
+                var b = 3;
+            end
+        end
+        print( "this code has compile error" );
+        return -1;
+    end
 end
-
-class sss:
-
-end
-

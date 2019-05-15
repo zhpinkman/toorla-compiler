@@ -13,7 +13,6 @@ public class ToorlaCompiler {
         NameAnalyzer nameAnalyzer = new NameAnalyzer(toorlaASTCode);
         nameAnalyzer.analyze();
 
-        System.out.println("zzz");
         toorlaASTCode.type_check(SymbolTable.root);
 
 

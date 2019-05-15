@@ -5,6 +5,7 @@ import toorla.ast.expression.Identifier;
 import toorla.ast.statement.Statement;
 import toorla.symbolTable.SymbolTable;
 import toorla.types.Type;
+import toorla.types.singleType.VoidType;
 import toorla.visitor.Visitor;
 
 public class LocalVarDef extends Statement {
@@ -20,7 +21,7 @@ public class LocalVarDef extends Statement {
 
     @Override
     public Type type_check(SymbolTable symbolTable) {
-        return null;
+        return new VoidType();
     }
 
     @Override

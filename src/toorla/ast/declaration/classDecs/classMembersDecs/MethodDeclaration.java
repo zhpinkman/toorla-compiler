@@ -72,9 +72,22 @@ public class MethodDeclaration extends Declaration implements ClassMemberDeclara
 
     @Override
     public Type type_check(SymbolTable symbolTable) {
+        String type_name = this.returnType.toString();
+        try {
+            if (type_name == "(IntType)" || type_name == "(BoolType)" || type_name == "(StringType)")
+                return new VoidType();
+            int index_of_name = type_name.indexOf(',');
+            type_name = type_name.substring(index_of_name + 1, type_name.length() - 1);
+            SymbolTable.top().get("class_" + type_name);
+        }
+        catch (Exception exception){
+            System.out.println("Error:Line:" + line + ":" + "There is no type with name " + type_name);
+        }
+        SymbolTable.pushFromQueue();
         for (Statement statement: this.getBody()){
             statement.type_check(symbolTable);
         }
+        SymbolTable.pop();
         return new VoidType();
     }
 }
