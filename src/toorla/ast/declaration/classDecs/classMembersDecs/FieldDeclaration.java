@@ -56,7 +56,7 @@ public class FieldDeclaration extends TypedVariableDeclaration implements ClassM
     public Type type_check(SymbolTable symbolTable) {
         try {
 //            System.out.println(this.type.);
-            symbolTable.get("sss");
+            SymbolTable.top().get("class_sss");
             System.out.println("hoooray");
         }
         catch (Exception exception){

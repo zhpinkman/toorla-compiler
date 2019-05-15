@@ -68,11 +68,12 @@ public class ClassDeclaration extends Declaration {
 
     @Override
     public Type type_check(SymbolTable symbolTable) {
+        symbolTable.pushFromQueue();
         for (ClassMemberDeclaration classMemberDeclaration: this.getClassMembers()){
-            symbolTable.pushFromQueue();
-            symbolTable.pushFromQueue();
+//            symbolTable.pushFromQueue();
+
             classMemberDeclaration.type_check(symbolTable);
-            symbolTable.pop();
+//            symbolTable.pop();
         }
         return new VoidType();
     }

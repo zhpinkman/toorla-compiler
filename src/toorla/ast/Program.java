@@ -32,6 +32,7 @@ public class Program extends Tree {
 
     @Override
     public Type type_check(SymbolTable symbolTable) {
+        symbolTable.pushFromQueue();
         for (ClassDeclaration classDeclaration : this.getClasses()){
             classDeclaration.type_check(symbolTable);
         }

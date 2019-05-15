@@ -2,7 +2,6 @@ package toorla.ast.statement;
 
 import toorla.ast.expression.Expression;
 import toorla.symbolTable.SymbolTable;
-import toorla.typeChecking.TypeCheck;
 import toorla.typeChecking.typeCheckExceptions.InvalidIncDecOperand;
 import toorla.typeChecking.typeCheckExceptions.TypeCheckException;
 import toorla.types.Type;
