@@ -3,8 +3,12 @@ package toorla.ast.declaration.classDecs.classMembersDecs;
 import toorla.ast.declaration.TypedVariableDeclaration;
 import toorla.ast.expression.Identifier;
 import toorla.symbolTable.SymbolTable;
+import toorla.typeChecking.typeCheckExceptions.InvalidClassName;
+import toorla.typeChecking.typeCheckExceptions.TypeCheckException;
 import toorla.types.Type;
 import toorla.visitor.Visitor;
+
+import javax.sound.midi.SysexMessage;
 
 public class FieldDeclaration extends TypedVariableDeclaration implements ClassMemberDeclaration {
 
@@ -50,6 +54,14 @@ public class FieldDeclaration extends TypedVariableDeclaration implements ClassM
 
     @Override
     public Type type_check(SymbolTable symbolTable) {
+        try {
+//            System.out.println(this.type.);
+            symbolTable.get("sss");
+            System.out.println("hoooray");
+        }
+        catch (Exception exception){
+            System.out.println("ahhh");
+        }
         return null;
     }
 }

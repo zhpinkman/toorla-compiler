@@ -10,10 +10,11 @@ public class ToorlaCompiler {
         CommonTokenStream tokenStream = new CommonTokenStream(toorlaLexer);
         ToorlaParser toorlaParser = new ToorlaParser(tokenStream);
         Program toorlaASTCode = toorlaParser.program().mProgram;
-//        NameAnalyzer nameAnalyzer = new NameAnalyzer(toorlaASTCode);
-//        nameAnalyzer.analyze();
+        NameAnalyzer nameAnalyzer = new NameAnalyzer(toorlaASTCode);
+        nameAnalyzer.analyze();
+
         System.out.println("zzz");
-        toorlaASTCode.type_check(new SymbolTable());
+        toorlaASTCode.type_check(SymbolTable.root);
 
     }
 }
