@@ -38,4 +38,9 @@ public class Neg extends UnaryExpression {
 	public String toString() {
 		return "Neg";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

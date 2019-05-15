@@ -1,6 +1,8 @@
 package toorla.ast;
 
 import toorla.ast.declaration.classDecs.ClassDeclaration;
+import toorla.symbolTable.SymbolTable;
+import toorla.types.Type;
 import toorla.visitor.Visitor;
 
 import java.util.ArrayList;
@@ -25,5 +27,10 @@ public class Program extends Tree {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        return null;
     }
 }

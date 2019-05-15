@@ -11,6 +11,7 @@ import java.util.List;
 public abstract class Tree {
 	public int line;
 	public int col;
+	public static int loop_depth = 0;
 	public List<CompileErrorException> relatedErrors = new ArrayList<>();
 
 	public abstract <R> R accept(Visitor<R> visitor);

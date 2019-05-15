@@ -37,4 +37,9 @@ public class And extends BinaryExpression {
 	public String toString() {
 		return "And";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

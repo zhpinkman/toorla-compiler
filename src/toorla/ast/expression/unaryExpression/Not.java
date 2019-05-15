@@ -38,4 +38,9 @@ public class Not extends UnaryExpression {
 	public String toString() {
 		return "Not";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

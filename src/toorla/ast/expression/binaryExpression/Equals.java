@@ -42,4 +42,9 @@ public class Equals extends BinaryExpression {
 	public String toString() {
 		return "Eq";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

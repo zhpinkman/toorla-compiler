@@ -43,4 +43,9 @@ public class GreaterThan extends BinaryExpression {
 	public String toString() {
 		return "Gt";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

@@ -42,4 +42,9 @@ public class Division extends BinaryExpression {
 	public String toString() {
 		return "Div";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

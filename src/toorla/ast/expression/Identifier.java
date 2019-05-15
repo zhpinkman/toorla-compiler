@@ -1,5 +1,7 @@
 package toorla.ast.expression;
 
+import toorla.symbolTable.SymbolTable;
+import toorla.types.Type;
 import toorla.visitor.Visitor;
 
 public class Identifier extends Expression {
@@ -18,10 +20,20 @@ public class Identifier extends Expression {
     }
 
     @Override
+    public Type type_check(SymbolTable symbolTable) {
+        return null;
+    }
+
+    @Override
     public String toString() {
         if (name != null)
             return "(Identifier," + name + ")";
         else
             return "(Identifier,Dummy)";
+    }
+
+    @Override
+    public Boolean lvalue_check(SymbolTable symbolTable) {
+        return true;
     }
 }

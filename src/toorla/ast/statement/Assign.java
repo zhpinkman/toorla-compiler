@@ -1,6 +1,11 @@
 package toorla.ast.statement;
 
 import toorla.ast.expression.Expression;
+import toorla.symbolTable.SymbolTable;
+import toorla.typeChecking.typeCheckExceptions.LvalueAssignability;
+import toorla.typeChecking.typeCheckExceptions.TypeCheckException;
+import toorla.types.Type;
+import toorla.types.singleType.VoidType;
 import toorla.visitor.Visitor;
 
 public class Assign extends Statement {
@@ -23,6 +28,19 @@ public class Assign extends Statement {
 
 	public <R> R accept(Visitor<R> visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	public Type type_check(SymbolTable symbolTable) {
+		try	{
+			if (!this.getLvalue().lvalue_check(symbolTable))
+				throw new LvalueAssignability(line, col);
+
+		}
+		catch(TypeCheckException exception){
+			exception.emit_error_message();
+		}
+		return new VoidType();
 	}
 
 	@Override

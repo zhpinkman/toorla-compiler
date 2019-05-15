@@ -42,4 +42,9 @@ public class Times extends BinaryExpression {
 	public String toString() {
 		return "Times";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

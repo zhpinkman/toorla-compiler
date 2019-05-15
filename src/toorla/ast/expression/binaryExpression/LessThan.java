@@ -42,4 +42,9 @@ public class LessThan extends BinaryExpression {
 	public String toString() {
 		return "Lt";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

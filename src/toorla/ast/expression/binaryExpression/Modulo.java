@@ -41,4 +41,9 @@ public class Modulo extends BinaryExpression {
 	public String toString() {
 		return "Mod";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

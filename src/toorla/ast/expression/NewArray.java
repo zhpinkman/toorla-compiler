@@ -1,5 +1,7 @@
 package toorla.ast.expression;
 
+import toorla.symbolTable.SymbolTable;
+import toorla.types.Type;
 import toorla.types.singleType.SingleType;
 import toorla.visitor.Visitor;
 
@@ -31,5 +33,15 @@ public class NewArray extends Expression {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        return null;
+    }
+
+    @Override
+    public Boolean lvalue_check(SymbolTable symbolTable) {
+        return true;
     }
 }

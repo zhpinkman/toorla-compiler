@@ -41,4 +41,9 @@ public class Plus extends BinaryExpression {
 	public String toString() {
 		return "Plus";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }

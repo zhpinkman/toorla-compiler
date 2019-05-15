@@ -43,4 +43,9 @@ public class NotEquals extends BinaryExpression {
     public String toString() {
         return "Neq";
     }
+
+    @Override
+    public Boolean lvalue_check(SymbolTable symbolTable) {
+        return false;
+    }
 }

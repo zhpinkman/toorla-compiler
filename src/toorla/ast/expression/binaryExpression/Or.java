@@ -37,4 +37,9 @@ public class Or extends BinaryExpression {
 	public String toString() {
 		return "Or";
 	}
+
+	@Override
+	public Boolean lvalue_check(SymbolTable symbolTable) {
+		return false;
+	}
 }
