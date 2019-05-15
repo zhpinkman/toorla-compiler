@@ -41,4 +41,8 @@ public class IntValue extends Value {
         return new IntType();
     }
 
+    @Override
+    public Boolean lvalue_check(SymbolTable symbolTable) {
+        return false;
+    }
 }

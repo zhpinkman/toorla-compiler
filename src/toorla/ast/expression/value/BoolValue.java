@@ -41,4 +41,9 @@ public class BoolValue extends Value {
     public Type type_check(SymbolTable symbolTable) {
         return new BoolType();
     }
+
+    @Override
+    public Boolean lvalue_check(SymbolTable symbolTable) {
+        return false;
+    }
 }

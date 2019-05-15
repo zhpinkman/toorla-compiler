@@ -2,6 +2,7 @@ package toorla.ast.declaration.classDecs.classMembersDecs;
 
 import toorla.ast.declaration.TypedVariableDeclaration;
 import toorla.ast.expression.Identifier;
+import toorla.symbolTable.SymbolTable;
 import toorla.types.Type;
 import toorla.visitor.Visitor;
 
@@ -45,5 +46,10 @@ public class FieldDeclaration extends TypedVariableDeclaration implements ClassM
     @Override
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        return null;
     }
 }

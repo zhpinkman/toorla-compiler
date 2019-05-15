@@ -1,6 +1,8 @@
 package toorla.ast.statement.localVarStats;
 
 import toorla.ast.statement.Statement;
+import toorla.symbolTable.SymbolTable;
+import toorla.types.Type;
 import toorla.visitor.Visitor;
 
 import java.util.ArrayList;
@@ -23,6 +25,11 @@ public class LocalVarsDefinitions extends Statement {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        return null;
     }
 
     @Override

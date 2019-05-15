@@ -1,6 +1,8 @@
 package toorla.ast.statement;
 
 import toorla.ast.expression.Expression;
+import toorla.symbolTable.SymbolTable;
+import toorla.types.Type;
 import toorla.visitor.Visitor;
 
 public class Conditional extends Statement {
@@ -22,6 +24,11 @@ public class Conditional extends Statement {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        return null;
     }
 
     public Expression getCondition() {

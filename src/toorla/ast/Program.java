@@ -3,6 +3,7 @@ package toorla.ast;
 import toorla.ast.declaration.classDecs.ClassDeclaration;
 import toorla.symbolTable.SymbolTable;
 import toorla.types.Type;
+import toorla.types.singleType.VoidType;
 import toorla.visitor.Visitor;
 
 import java.util.ArrayList;
@@ -31,6 +32,9 @@ public class Program extends Tree {
 
     @Override
     public Type type_check(SymbolTable symbolTable) {
-        return null;
+        for (ClassDeclaration classDeclaration : this.getClasses()){
+            classDeclaration.type_check(symbolTable);
+        }
+        return new VoidType();
     }
 }

@@ -3,6 +3,8 @@ package toorla.ast.statement.localVarStats;
 import toorla.ast.expression.Expression;
 import toorla.ast.expression.Identifier;
 import toorla.ast.statement.Statement;
+import toorla.symbolTable.SymbolTable;
+import toorla.types.Type;
 import toorla.visitor.Visitor;
 
 public class LocalVarDef extends Statement {
@@ -15,6 +17,11 @@ public class LocalVarDef extends Statement {
     }
 
     public <R> R accept( Visitor<R> visitor ) { return visitor.visit( this ); }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        return null;
+    }
 
     @Override
     public String toString() {

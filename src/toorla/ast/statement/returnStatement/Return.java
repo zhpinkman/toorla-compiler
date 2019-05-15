@@ -2,6 +2,8 @@ package toorla.ast.statement.returnStatement;
 
 import toorla.ast.expression.Expression;
 import toorla.ast.statement.Statement;
+import toorla.symbolTable.SymbolTable;
+import toorla.types.Type;
 import toorla.visitor.Visitor;
 
 public class Return extends Statement {
@@ -20,6 +22,12 @@ public class Return extends Statement {
     {
         return visitor.visit( this );
     }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        return null;
+    }
+
     @Override
     public String toString()
     {

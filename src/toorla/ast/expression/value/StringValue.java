@@ -40,4 +40,8 @@ public class StringValue extends Value {
         return new StringType();
     }
 
+    @Override
+    public Boolean lvalue_check(SymbolTable symbolTable) {
+        return false;
+    }
 }

@@ -5,6 +5,9 @@ import toorla.ast.declaration.classDecs.classMembersDecs.ClassMemberDeclaration;
 import toorla.ast.declaration.classDecs.classMembersDecs.FieldDeclaration;
 import toorla.ast.declaration.classDecs.classMembersDecs.MethodDeclaration;
 import toorla.ast.expression.Identifier;
+import toorla.symbolTable.SymbolTable;
+import toorla.types.Type;
+import toorla.types.singleType.VoidType;
 import toorla.visitor.Visitor;
 
 import java.util.ArrayList;
@@ -61,5 +64,13 @@ public class ClassDeclaration extends Declaration {
     @Override
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        for (ClassMemberDeclaration classMemberDeclaration: this.getClassMembers()){
+            classMemberDeclaration.type_check(symbolTable);
+        }
+        return new VoidType();
     }
 }

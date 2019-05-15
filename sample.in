@@ -1,0 +1,26 @@
+entry class Test :
+    private field length , length , length1 , length1 , length int;
+
+    public field temp_length bool;
+
+    public function main() returns int :
+        var length = 2;
+        var length1 = 3;
+        var a = 3;
+        begin
+            var a = 2;
+            begin
+                var a1 = 2;
+                var b = 3;
+                var a1 = 3 , a4 = 4 , a1 = 5;
+            end
+            var a = true;
+            a + 2 = 4;
+        end
+        print( "this code has compile error" );
+        return -1;
+    end
+
+    public field temp_length int;
+
+end

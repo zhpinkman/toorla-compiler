@@ -4,7 +4,9 @@ import toorla.ast.declaration.Declaration;
 import toorla.ast.declaration.localVarDecs.ParameterDeclaration;
 import toorla.ast.expression.Identifier;
 import toorla.ast.statement.Statement;
+import toorla.symbolTable.SymbolTable;
 import toorla.types.Type;
+import toorla.types.singleType.VoidType;
 import toorla.visitor.Visitor;
 
 import java.util.ArrayList;
@@ -66,5 +68,13 @@ public class MethodDeclaration extends Declaration implements ClassMemberDeclara
     @Override
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    public Type type_check(SymbolTable symbolTable) {
+        for (Statement statement: this.getBody()){
+            statement.type_check(symbolTable);
+        }
+        return new VoidType();
     }
 }
