@@ -208,7 +208,7 @@ public class TypeChecking implements Visitor<Type> {
 
         }
         catch (Exception exception){
-            System.out.println("testing");
+//            System.out.println("testing");
         }
 
 
@@ -463,8 +463,10 @@ public class TypeChecking implements Visitor<Type> {
 
             case CLASS_CALLING:
                 who_is_calling_identifier = VARIABLE_CALLING;
+                System.out.println("zzz");
                 try{
-                    ClassSymbolTableItem method_item = (ClassSymbolTableItem) SymbolTable.top().get("class_" + identifier.getName());
+                    ClassSymbolTableItem class_item = (ClassSymbolTableItem) SymbolTable.top().get("class_" + identifier.getName());
+                    System.out.println("ttt");
                 }
                 catch (Exception e){
                     try{
@@ -534,14 +536,15 @@ public class TypeChecking implements Visitor<Type> {
     @Override
     public Type visit(FieldCall fieldCall) {
         try {
-            who_is_calling_identifier = CLASS_CALLING;
-            UserDefinedType class_type = (UserDefinedType) fieldCall.getInstance().accept(this);
-            Identifier class_name = class_type.getClassDeclaration().getName();
-
-            ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(class_name.getName());
+            who_is_calling_identifier = VARIABLE_CALLING;
+            String class_name = ((UserDefinedType) fieldCall.getInstance().accept(this)).getClassDeclaration().getName().getName();
+            ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + class_name);
+//            System.out.println("test");
             try {
-                FieldSymbolTableItem field = (FieldSymbolTableItem) class_symbol_table.getSymbolTable().get(fieldCall.getField().getName());
+                FieldSymbolTableItem field = (FieldSymbolTableItem) class_symbol_table.getSymbolTable().get(VAR_PREFIX + fieldCall.getField().getName());
+                System.out.println(field.getVarType());
                 return field.getVarType(); // PRIVATE TODO
+//                System.out.println("tested");
             }catch (Exception e){
 
             }
@@ -549,9 +552,7 @@ public class TypeChecking implements Visitor<Type> {
             Type field_type = fieldCall.getField().accept(this);
             return field_type;
         }
-        catch (Exception e){
-
-        }
+        catch (Exception e){}
 
         return new UndefinedType();
     }
