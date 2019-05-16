@@ -20,6 +20,8 @@ import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 import toorla.nameAnalyzer.ClassParentshipExtractorPass;
 import toorla.symbolTable.SymbolTable;
+import toorla.symbolTable.symbolTableItem.SymbolTableItem;
+import toorla.symbolTable.symbolTableItem.varItems.FieldSymbolTableItem;
 import toorla.typeChecking.typeCheckExceptions.*;
 import toorla.types.Type;
 import toorla.types.singleType.BoolType;
@@ -35,6 +37,7 @@ public class TypeChecking implements Visitor<Type> {
     private static int loop_depth;
     private String INT_TYPE = "(IntType)";
     private String STR_TYPE = "(StringType)";
+    private int var_index = 0;
 
     public TypeChecking(Program p){
         program = p;
@@ -160,6 +163,7 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(LocalVarDef localVarDef) {
+        var_index++;
         return new VoidType();
     }
 
@@ -360,11 +364,24 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(MethodCall methodCall) {
+        Type instance_type = methodCall.getInstance().accept(this);
+
         return null;
     }
 
     @Override
     public Type visit(Identifier identifier) {
+        SymbolTable s = new SymbolTable().top();
+
+        try {
+            SymbolTableItem var_item = SymbolTable.top().get("var_"+identifier.getName());
+            System.out.println(var_index);
+
+        }catch (Exception e){
+            System.out.println("bbb");
+        }
+
+
         return null;
     }
 
@@ -467,6 +484,7 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(MethodDeclaration methodDeclaration) {
+        var_index = 0;
         String type_name = methodDeclaration.getReturnType().toString();
         try {
             if (!type_name.equals(INT_TYPE) && !type_name.equals("(BoolType)") && !type_name.equals(STR_TYPE)) {
@@ -489,6 +507,10 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(LocalVarsDefinitions localVarsDefinitions) {
+        for (LocalVarDef lvd:
+             localVarsDefinitions.getVarDefinitions()) {
+            lvd.accept(this);
+        }
         return null;
     }
 
