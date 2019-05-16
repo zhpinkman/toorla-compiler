@@ -1,11 +1,13 @@
 entry class t1 :
-    public field temp bool;
+    //public field temp int;
 
     public function main() returns int:
-        var temp = 2;
-        var x = new t3();
-        var a = new t2();
-        a = x;
+        //var temp = 2;
+        //var x = new t3();
+        //var y = new t2();
+        //var a = new t2();
+        //a = y;
+        temp = true;
         return 2;
     end
 end

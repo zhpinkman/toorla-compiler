@@ -63,7 +63,9 @@ public class TypeChecking implements Visitor<Type> {
 
     public Boolean is_subtype(String lhs, String rhs){
         try {
-            if (classHierarchy.getParentsOfNode(rhs).contains(lhs)){
+//            System.out.println(lhs);
+//            System.out.println(rhs);
+            if (classHierarchy.getParentsOfNode(rhs).contains(lhs) || lhs.equals(rhs)){
 //                System.out.println(true);
                 return true;
             }
@@ -73,7 +75,7 @@ public class TypeChecking implements Visitor<Type> {
             }
         }
         catch (Exception exception){
-
+            System.out.println("wow");
         }
         return null;
     }
@@ -146,6 +148,15 @@ public class TypeChecking implements Visitor<Type> {
                 exception.emit_error_message();
             }
 
+        }
+        else{
+            try{
+                if (lhs.toString() != rhs.toString()) // not sure about arrays and assigning each of them to one another
+                    throw new LvalueAssignability(assignStat.line, assignStat.col);
+            }
+            catch (TypeCheckException exception){
+                exception.emit_error_message();
+            }
         }
 
         return new VoidType();
@@ -462,30 +473,38 @@ public class TypeChecking implements Visitor<Type> {
         return null;
     }
 
+
     @Override
     public Type visit(Identifier identifier) {
 //        System.out.println("here");
         SymbolTable s = new SymbolTable().top();
 
         switch (who_is_calling_identifier){
-            case VARIABLE_CALLING:
+            case VARIABLE_CALLING: {
                 try {
-                    LocalVariableSymbolTableItem var_item = (LocalVariableSymbolTableItem) SymbolTable.top().get("var_"+identifier.getName());
-                    if (var_item.getIndex() <= var_index){
+                    LocalVariableSymbolTableItem var_item = (LocalVariableSymbolTableItem) SymbolTable.top().get("var_" + identifier.getName());
+                    if (var_item.getIndex() <= var_index) {
                         Type type = var_item.getInital_value().accept(this);
 //                System.out.println(type);
                         return type;
                     }
 //            System.out.println(var_index);
+                } catch (Exception exception) {
+//                    try {
+//                        throw new InvalidVariableCall(identifier.line, identifier.col, identifier.getName());
+//                    } catch (TypeCheckException e) {
+//                        e.emit_error_message();
+//                    }
                 }
-                catch (Exception exception){
-                    try{
-                        throw new InvalidVariableCall(identifier.line, identifier.col, identifier.getName());
-                    }catch (TypeCheckException e){
-                        e.emit_error_message();
-                    }
+
+                try {
+                    FieldSymbolTableItem field_item = (FieldSymbolTableItem) SymbolTable.top().get("var_" + identifier.getName());
+                    return field_item.getVarType();
+                } catch (Exception exception) {
+                    System.out.println("error about couldn't finding variable or field"); // not sure which error to emit
+                    return new UndefinedType();
                 }
-                break;
+            }
 
             case FIELD_CALLING:
                 who_is_calling_identifier = VARIABLE_CALLING;
@@ -505,7 +524,7 @@ public class TypeChecking implements Visitor<Type> {
                 catch (Exception e){
 
                 }
-                break;
+
 
             case CLASS_CALLING:
                 who_is_calling_identifier = VARIABLE_CALLING;
@@ -521,7 +540,6 @@ public class TypeChecking implements Visitor<Type> {
                         e2.emit_error_message();
                     }
                 }
-                break;
         }
 
 
