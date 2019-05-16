@@ -1,0 +1,9 @@
+entry class Sample1 :
+    function main() returns int :
+        var i = "aa";
+        if( 10 ) begin
+
+        end
+
+    end
+end

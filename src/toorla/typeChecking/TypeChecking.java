@@ -27,7 +27,6 @@ import toorla.types.singleType.IntType;
 import toorla.types.singleType.StringType;
 import toorla.types.singleType.VoidType;
 import toorla.visitor.Visitor;
-import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
 import toorla.utilities.graph.Graph;
 
 public class TypeChecking implements Visitor<Type> {
@@ -78,19 +77,37 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(Block block) {
+        SymbolTable.pushFromQueue();
         for (Statement statement: block.body){
             statement.accept(this);
         }
+        SymbolTable.pop();
+
         return new VoidType();
     }
 
     @Override
     public Type visit(Conditional conditional) {
+        Type cond = conditional.getCondition().accept(this);
+        try {
+            if (!cond.toString().equals("(BoolType)")) {
+                throw new InvalidLoopCondition(conditional.line, conditional.col, conditional.toString());
+            }
+        }catch (TypeCheckException exception){
+            exception.emit_error_message();
+        }
+        SymbolTable.pushFromQueue();
+        conditional.getThenStatement().accept(this);
+        SymbolTable.pop();
+        SymbolTable.pushFromQueue();
+        conditional.getElseStatement().accept(this);
+        SymbolTable.pop();
         return null;
     }
 
     @Override
     public Type visit(While whileStat) {
+        SymbolTable.pushFromQueue();
         loop_depth ++;
         Type expr_type = whileStat.expr.accept(this);
         Type body_type = whileStat.body.accept(this);
@@ -103,6 +120,7 @@ public class TypeChecking implements Visitor<Type> {
             exception.emit_error_message();
         }
         loop_depth --;
+        SymbolTable.pop();
         return body_type;
     }
 
@@ -417,7 +435,12 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(EntryClassDeclaration entryClassDeclaration) {
-        return null;
+        SymbolTable.pushFromQueue();
+        for (ClassMemberDeclaration classMemberDeclaration: entryClassDeclaration.getClassMembers()){
+            classMemberDeclaration.accept(this);
+        }
+        SymbolTable.pop();
+        return new VoidType();
     }
 
     @Override
@@ -455,11 +478,13 @@ public class TypeChecking implements Visitor<Type> {
         catch (Exception exception){
             System.out.println("Error:Line:" + methodDeclaration.line + ":" + "There is no type with name " + type_name);
         }
+
         SymbolTable.pushFromQueue();
         for (Statement statement: methodDeclaration.getBody()){
             statement.accept(this);
         }
         SymbolTable.pop();
+
         return new VoidType();
     }
 
