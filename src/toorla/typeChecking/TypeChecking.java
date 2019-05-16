@@ -43,6 +43,7 @@ public class TypeChecking implements Visitor<Type> {
     private String INT_TYPE = "(IntType)";
     private String INT_ARRAY = "(ArrayType,IntType)";
     private String STR_TYPE = "(StringType)";
+    private String BOOL_TYPE = "(BoolType)";
     private String method_return_type = "";
     private String VAR_PREFIX = "var_";
     private String CLASS_PREFIX = "class_";
@@ -59,6 +60,31 @@ public class TypeChecking implements Visitor<Type> {
     private static final String METHOD_CALLING = "METHOD_CALLING_ID";
     private static final String ARRAY_CALLING = "ARRAY_CALLING_ID";
     private String who_is_calling_identifier = VARIABLE_CALLING;
+
+    public Boolean is_subtype(String lhs, String rhs){
+        try {
+            if (classHierarchy.getParentsOfNode(rhs).contains(lhs)){
+//                System.out.println(true);
+                return true;
+            }
+            else{
+//                System.out.println(false);
+                return false;
+            }
+        }
+        catch (Exception exception){
+
+        }
+        return null;
+    }
+
+    public Boolean is_not_primitive(Type type){
+        if (type.toString() != INT_TYPE && type.toString() != STR_TYPE && type.toString() != BOOL_TYPE
+        && !type.toString().startsWith("(ArrayType,"))
+            return true;
+        else
+            return false;
+    }
 
     public TypeChecking(Program p){
         program = p;
@@ -97,17 +123,31 @@ public class TypeChecking implements Visitor<Type> {
             exception.emit_error_message();
         }
         Type lhs = assignStat.getLvalue().accept(this);
-        System.out.println(lhs);
-        Type rhs = assignStat.getRvalue().accept(this);
-        System.out.println(rhs);
 //        System.out.println(lhs);
+        Type rhs = assignStat.getRvalue().accept(this);
 //        System.out.println(rhs);
-//        try {
-//            SymbolTable.top().get(assignStat.getLvalue().)
-//        }
-//        catch (Exception exception){
-//
-//        }
+        if (is_not_primitive(lhs) && is_not_primitive(rhs)){
+            String rhs_class_name ;
+            String lhs_class_name ;
+            int index;
+            index = lhs.toString().indexOf(',');
+            lhs_class_name = lhs.toString().substring(index + 1, lhs.toString().length() - 1);
+            index = rhs.toString().indexOf(',');
+            rhs_class_name = rhs.toString().substring(index + 1, rhs.toString().length() - 1);
+//            System.out.println(lhs_class_name);
+//            System.out.println(rhs_class_name);
+            try {
+                if (is_subtype(lhs_class_name, rhs_class_name))
+                    return new VoidType();
+                else
+                    throw new LvalueAssignability(assignStat.line, assignStat.col);
+            }
+            catch (TypeCheckException exception){
+                exception.emit_error_message();
+            }
+
+        }
+
         return new VoidType();
     }
 

@@ -3,8 +3,9 @@ entry class t1 :
 
     public function main() returns int:
         var temp = 2;
+        var x = new t3();
         var a = new t2();
-        temp = 2;
+        a = x;
         return 2;
     end
 end
