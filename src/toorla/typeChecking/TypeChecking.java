@@ -33,7 +33,9 @@ import toorla.utilities.graph.Graph;
 public class TypeChecking implements Visitor<Type> {
     private Program program;
     private Graph<String> classHierarchy;
-    public static int loop_depth;
+    private static int loop_depth;
+    private String INT_TYPE = "(IntType)";
+    private String STR_TYPE = "(StringType)";
 
     public TypeChecking(Program p){
         program = p;
@@ -53,7 +55,7 @@ public class TypeChecking implements Visitor<Type> {
         Type expr_type = printStat.getArg().accept(this);
         try{
             String str = expr_type.toString();
-            if (str != "(IntType)" && str != "(StringType)" && str != "(ArrayType,IntType)")
+            if (!str.equals(INT_TYPE)&& !str.equals(STR_TYPE) && !str.equals("(ArrayType,IntType)"))
                 throw new PrintArgException(printStat.line, printStat.col);
         }
         catch (TypeCheckException exception){
@@ -94,7 +96,7 @@ public class TypeChecking implements Visitor<Type> {
         Type body_type = whileStat.body.accept(this);
 
         try	{
-            if (expr_type.toString() != "(BoolType)")
+            if (!expr_type.toString().equals("(BoolType)"))
                 throw new InvalidLoopCondition(whileStat.line, whileStat.col, whileStat.toString());
         }
         catch (TypeCheckException exception){
@@ -173,7 +175,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = plusExpr.getLhs().accept(this);
         Type second_operand_type = plusExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != "(IntType)" || second_operand_type.toString() != "(IntType)")
+            if (!first_operand_type.toString().equals(INT_TYPE)  || !second_operand_type.toString().equals(INT_TYPE))
                 throw new InvalidOperationOperands(plusExpr.line, plusExpr.col, plusExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -188,7 +190,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = minusExpr.getLhs().accept(this);
         Type second_operand_type = minusExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != "(IntType)" || second_operand_type.toString() != "(IntType)")
+            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
                 throw new InvalidOperationOperands(minusExpr.line, minusExpr.col,minusExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -202,7 +204,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = timesExpr.getLhs().accept(this);
         Type second_operand_type = timesExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != "(IntType)" || second_operand_type.toString() != "(IntType)")
+            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
                 throw new InvalidOperationOperands(timesExpr.line, timesExpr.col, timesExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -216,7 +218,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = divExpr.getLhs().accept(this);
         Type second_operand_type = divExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != "(IntType)" || second_operand_type.toString() != "(IntType)")
+            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
                 throw new InvalidOperationOperands(divExpr.line, divExpr.col, divExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -231,7 +233,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = moduloExpr.getLhs().accept(this);
         Type second_operand_type = moduloExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != "(IntType)" || second_operand_type.toString() != "(IntType)")
+            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
                 throw new InvalidOperationOperands(moduloExpr.line, moduloExpr.col, moduloExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -245,7 +247,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type =  equalsExpr.getLhs().accept(this);
         Type second_operand_type =  equalsExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != second_operand_type.toString() )
+            if (!first_operand_type.toString().equals(second_operand_type.toString()) )
                 throw new InvalidOperationOperands( equalsExpr.line,  equalsExpr.col, equalsExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -259,7 +261,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = gtExpr.getLhs().accept(this);
         Type second_operand_type = gtExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != "(IntType)" || second_operand_type.toString() != "(IntType)")
+            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
                 throw new InvalidOperationOperands(gtExpr.line, gtExpr.col, gtExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -273,7 +275,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = lessThanExpr.getLhs().accept(this);
         Type second_operand_type = lessThanExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != "(IntType)" || second_operand_type.toString() != "(IntType)")
+            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
                 throw new InvalidOperationOperands(lessThanExpr.line, lessThanExpr.col, lessThanExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -288,7 +290,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = andExpr.getLhs().accept(this);
         Type second_operand_type = andExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != "(BoolType)" || second_operand_type.toString() != "(BoolType)")
+            if (!first_operand_type.toString().equals("(BoolType)") || !second_operand_type.toString().equals("(BoolType)"))
                 throw new InvalidOperationOperands(andExpr.line, andExpr.col, andExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -303,7 +305,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = orExpr.getLhs().accept(this);
         Type second_operand_type = orExpr.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != "(BoolType)" || second_operand_type.toString() != "(BoolType)")
+            if (!first_operand_type.toString().equals("(BoolType)") || !second_operand_type.toString().equals("(BoolType)"))
                 throw new InvalidOperationOperands(orExpr.line, orExpr.col, orExpr.toString());
         }
         catch (TypeCheckException exception){
@@ -316,7 +318,7 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(Neg negExpr) {
         Type type = negExpr.getExpr().accept(this);
         try{
-            if (type.toString() != "(IntType)")
+            if (!type.toString().equals(INT_TYPE))
                 throw new InvalidOperationOperands(negExpr.line, negExpr.col, negExpr.toString());
         }
         catch(TypeCheckException exception){
@@ -329,7 +331,7 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(Not notExpr) {
         Type type = notExpr.getExpr().accept(this);
         try{
-            if (type.toString() != "(BoolType)")
+            if (!type.toString().equals("(BoolType)"))
                 throw new InvalidOperationOperands(notExpr.line, notExpr.col, notExpr.toString());
         }
         catch(TypeCheckException exception){
@@ -394,7 +396,7 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = notEquals.getLhs().accept(this);
         Type second_operand_type = notEquals.getRhs().accept(this);
         try {
-            if (first_operand_type.toString() != second_operand_type.toString())
+            if (!first_operand_type.toString().equals(second_operand_type.toString()))
                 throw new InvalidOperationOperands(notEquals.line, notEquals.col, notEquals.toString());
         }
         catch (TypeCheckException exception){
@@ -423,7 +425,7 @@ public class TypeChecking implements Visitor<Type> {
         String type_name = "";
         String hard_type = fieldDeclaration.getType().toString();
         try {
-            if (hard_type == "(IntType)" || hard_type == "(BoolType)" || hard_type == "(StringType)")
+            if (hard_type.equals(INT_TYPE) || hard_type.equals("(BoolType)") || hard_type.equals(STR_TYPE))
                 return new VoidType();
             int index_of_name = hard_type.indexOf(',');
             type_name = hard_type.substring(index_of_name + 1, hard_type.length() - 1);
@@ -444,7 +446,7 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(MethodDeclaration methodDeclaration) {
         String type_name = methodDeclaration.getReturnType().toString();
         try {
-            if (type_name == "(IntType)" || type_name == "(BoolType)" || type_name == "(StringType)")
+            if (type_name.equals(INT_TYPE) || type_name.equals("(BoolType)") || type_name.equals(STR_TYPE))
                 return new VoidType();
             int index_of_name = type_name.indexOf(',');
             type_name = type_name.substring(index_of_name + 1, type_name.length() - 1);
