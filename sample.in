@@ -1,19 +1,25 @@
 entry class t1 :
-    //public field temp int;
+    public field temp bool;
 
     public function main() returns int:
         //var temp = 2;
         //var x = new t3();
-        //var y = new t2();
-        //var a = new t2();
+        var y = new t2();
+        var a = new t2();
+        //var z = new t1();
         //a = y;
         temp = true;
-        return 2;
+        var tt = a.doSearch(y);
+        //return 2;
     end
 end
 
 class t2:
     public field temp int;
+    public function doSearch(a : t2) returns int :
+        //var p = 2;
+    end
+
 end
 
 

@@ -258,8 +258,9 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(LocalVarDef localVarDef) {
         var_index++;
         try {
+//            System.out.println("1");
             LocalVariableSymbolTableItem lvst = (LocalVariableSymbolTableItem) SymbolTable.top().get(VAR_PREFIX + localVarDef.getLocalVarName().getName());
-            lvst.setInital_value(localVarDef.getInitialValue());
+            lvst.setInital_value(localVarDef.getInitialValue().accept(this));
 //            System.out.println(lvst.getInital_value());
 
         }
@@ -468,7 +469,10 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(MethodCall methodCall) {
-        Type instance_type = methodCall.getInstance().accept(this);
+        String class_name = ((UserDefinedType) methodCall.getInstance().accept(this)).getClassDeclaration().getName().getName();
+
+        // as same as field call TODO
+//        System.out.println(class_name);
 
         return null;
     }
@@ -484,7 +488,7 @@ public class TypeChecking implements Visitor<Type> {
                 try {
                     LocalVariableSymbolTableItem var_item = (LocalVariableSymbolTableItem) SymbolTable.top().get("var_" + identifier.getName());
                     if (var_item.getIndex() <= var_index) {
-                        Type type = var_item.getInital_value().accept(this);
+                        Type type = var_item.getInital_value();
 //                System.out.println(type);
                         return type;
                     }
@@ -718,13 +722,18 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(MethodDeclaration methodDeclaration) {
+//        System.out.println(methodDeclaration);
         method_return_type = methodDeclaration.getReturnType().toString(); // setting return type of the method declaration
+
         var_index = 0;
+
         String type_name = methodDeclaration.getReturnType().toString();
+
         try {
-            if (!type_name.equals(INT_TYPE) && !type_name.equals("(BoolType)") && !type_name.equals(STR_TYPE)) {
+            if (!type_name.equals(INT_TYPE) && !type_name.equals(BOOL_TYPE) && !type_name.equals(STR_TYPE)) {
                 int index_of_name = type_name.indexOf(',');
                 type_name = type_name.substring(index_of_name + 1, type_name.length() - 1);
+
             }
         }
         catch (Exception exception){
@@ -732,6 +741,7 @@ public class TypeChecking implements Visitor<Type> {
         }
         SymbolTable.pushFromQueue();
         for (Statement statement: methodDeclaration.getBody()){
+
             statement.accept(this);
         }
         SymbolTable.pop();
