@@ -3,6 +3,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import toorla.ast.Program;
 import toorla.nameAnalyzer.NameAnalyzer;
 import toorla.symbolTable.SymbolTable;
+import toorla.typeChecking.TypeChecking;
 
 public class ToorlaCompiler {
     public void compile(CharStream textStream) {
@@ -13,7 +14,10 @@ public class ToorlaCompiler {
         NameAnalyzer nameAnalyzer = new NameAnalyzer(toorlaASTCode);
         nameAnalyzer.analyze();
 
-        toorlaASTCode.type_check(SymbolTable.root);
+        TypeChecking tc = new TypeChecking(toorlaASTCode);
+        tc.check();
+
+        //toorlaASTCode.type_check(SymbolTable.root);
 
 
     }

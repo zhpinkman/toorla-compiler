@@ -69,4 +69,10 @@ public class FieldDeclaration extends TypedVariableDeclaration implements ClassM
         }
         return null;
     }
+
+    @Override
+    public Type getType() {
+        return this.type;
+    }
+
 }

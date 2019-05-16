@@ -42,4 +42,6 @@ public class And extends BinaryExpression {
 	public Boolean lvalue_check(SymbolTable symbolTable) {
 		return false;
 	}
+
+
 }

@@ -90,4 +90,5 @@ public class MethodDeclaration extends Declaration implements ClassMemberDeclara
         SymbolTable.pop();
         return new VoidType();
     }
+
 }
