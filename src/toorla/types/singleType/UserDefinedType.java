@@ -21,4 +21,6 @@ public class UserDefinedType extends SingleType {
     public String toString() {
         return "(UserDefined," + typeClass.getName().getName() + ")";
     }
+
+
 }

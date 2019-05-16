@@ -1,16 +1,14 @@
-entry class Test :
-    public field temp_length bool;
+entry class t1 :
+    public field temp bool;
 
-    public function main() returns zhivar :
-        var a = 3;
-        begin
-            var a = 2;
-            begin
-                var a1 = 2;
-                var b = 3;
-            end
-        end
-        print( "this code has compile error" );
-        return -1;
+    public function main() returns int:
+
+        var a = new t2();
+        a.temp = 2;
+        return 2;
     end
+end
+
+class t2:
+    public field temp int;
 end
