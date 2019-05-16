@@ -469,16 +469,15 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(MethodDeclaration methodDeclaration) {
         String type_name = methodDeclaration.getReturnType().toString();
         try {
-            if (type_name.equals(INT_TYPE) || type_name.equals("(BoolType)") || type_name.equals(STR_TYPE))
-                return new VoidType();
-            int index_of_name = type_name.indexOf(',');
-            type_name = type_name.substring(index_of_name + 1, type_name.length() - 1);
-            SymbolTable.top().get("class_" + type_name);
+            if (!type_name.equals(INT_TYPE) && !type_name.equals("(BoolType)") && !type_name.equals(STR_TYPE)) {
+                int index_of_name = type_name.indexOf(',');
+                type_name = type_name.substring(index_of_name + 1, type_name.length() - 1);
+                SymbolTable.top().get("class_" + type_name);
+            }
         }
         catch (Exception exception){
             System.out.println("Error:Line:" + methodDeclaration.line + ":" + "There is no type with name " + type_name);
         }
-
         SymbolTable.pushFromQueue();
         for (Statement statement: methodDeclaration.getBody()){
             statement.accept(this);

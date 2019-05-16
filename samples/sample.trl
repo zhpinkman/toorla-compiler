@@ -1,9 +1,9 @@
 entry class Sample1 :
+    public field v int;
     function main() returns int :
         var i = "aa";
-        if( 10 ) begin
-
-        end
+        if( "sss" )
+            i++;
 
     end
 end
