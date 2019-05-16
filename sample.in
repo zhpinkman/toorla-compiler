@@ -2,13 +2,18 @@ entry class t1 :
     public field temp bool;
 
     public function main() returns int:
-
+        var temp = 2;
         var a = new t2();
-        a.temp = 2;
+        temp = 2;
         return 2;
     end
 end
 
 class t2:
     public field temp int;
+end
+
+
+class t3 inherits t2:
+
 end

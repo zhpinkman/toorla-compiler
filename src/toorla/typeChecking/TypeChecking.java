@@ -49,6 +49,9 @@ public class TypeChecking implements Visitor<Type> {
     private String METHOD_PREFIX = "method_";
     private String FIELD_PREFIX = "field_";
     private int var_index = 0;
+    private static ClassDeclaration current_class;
+    private String public_access = "(ACCESS_MODIFIER_PUBLIC)";
+    private String private_access = "(ACCESS_MODIFIER_PRIVATE)";
 
     private static final String VARIABLE_CALLING = "VAR_CALLING_ID";
     private static final String FIELD_CALLING = "FIELD_CALLING_ID";
@@ -94,7 +97,9 @@ public class TypeChecking implements Visitor<Type> {
             exception.emit_error_message();
         }
         Type lhs = assignStat.getLvalue().accept(this);
+        System.out.println(lhs);
         Type rhs = assignStat.getRvalue().accept(this);
+        System.out.println(rhs);
 //        System.out.println(lhs);
 //        System.out.println(rhs);
 //        try {
@@ -419,6 +424,7 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(Identifier identifier) {
+//        System.out.println("here");
         SymbolTable s = new SymbolTable().top();
 
         switch (who_is_calling_identifier){
@@ -463,10 +469,10 @@ public class TypeChecking implements Visitor<Type> {
 
             case CLASS_CALLING:
                 who_is_calling_identifier = VARIABLE_CALLING;
-                System.out.println("zzz");
+//                System.out.println("zzz");
                 try{
                     ClassSymbolTableItem class_item = (ClassSymbolTableItem) SymbolTable.top().get("class_" + identifier.getName());
-                    System.out.println("ttt");
+//                    System.out.println("ttt");
                 }
                 catch (Exception e){
                     try{
@@ -493,6 +499,7 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(Self self) {
+//        System.out.println("here");
         return null;
     }
 
@@ -536,24 +543,54 @@ public class TypeChecking implements Visitor<Type> {
     @Override
     public Type visit(FieldCall fieldCall) {
         try {
-            who_is_calling_identifier = VARIABLE_CALLING;
+//            System.out.println("and here");
+//            System.out.println(fieldCall.getInstance().toString());
+
             String class_name = ((UserDefinedType) fieldCall.getInstance().accept(this)).getClassDeclaration().getName().getName();
+//            System.out.println("here too");
             ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + class_name);
 //            System.out.println("test");
             try {
                 FieldSymbolTableItem field = (FieldSymbolTableItem) class_symbol_table.getSymbolTable().get(VAR_PREFIX + fieldCall.getField().getName());
-                System.out.println(field.getVarType());
-                return field.getVarType(); // PRIVATE TODO
+//                System.out.println(field.getVarType());
+//                System.out.println(public_access);
+//                System.out.println(field.getAccessModifier());
+                if (field.getAccessModifier().toString().equals(public_access)){
+                    return field.getVarType(); // PRIVATE TODO
+                }
+
+                else
+                    throw new IllegalAccessToMember(fieldCall.line, fieldCall.col, class_name, "FIELD", field.getName());
 //                System.out.println("tested");
-            }catch (Exception e){
+            }catch (Exception  exception){
 
             }
             who_is_calling_identifier = FIELD_CALLING;
             Type field_type = fieldCall.getField().accept(this);
             return field_type;
         }
-        catch (Exception e){}
 
+        catch (Exception e){
+
+        }
+        try {
+            if (fieldCall.getInstance().toString().equals("(Self)")) {
+//                System.out.println("zzz");
+//                System.out.println(current_class.getName().getName());
+//                System.out.println(CLASS_PREFIX + current_class.getName().getName());
+                ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + current_class.getName().getName());
+//                System.out.println("test");
+                try {
+                    FieldSymbolTableItem field = (FieldSymbolTableItem) class_symbol_table.getSymbolTable().get(VAR_PREFIX + fieldCall.getField().getName());
+//                    System.out.println(field.getVarType());
+                    return field.getVarType();
+                }
+                catch (Exception exception){}
+            }
+        }
+        catch (Exception exception){
+
+        }
         return new UndefinedType();
     }
 
@@ -579,6 +616,7 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(ClassDeclaration classDeclaration) {
+        current_class = classDeclaration;
         SymbolTable.pushFromQueue();
         for (ClassMemberDeclaration classMemberDeclaration: classDeclaration.getClassMembers()){
             classMemberDeclaration.accept(this);
@@ -589,6 +627,7 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(EntryClassDeclaration entryClassDeclaration) {
+        current_class = entryClassDeclaration;
         SymbolTable.pushFromQueue();
         for (ClassMemberDeclaration classMemberDeclaration: entryClassDeclaration.getClassMembers()){
             classMemberDeclaration.accept(this);
@@ -654,6 +693,7 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(Program program) {
         SymbolTable.pushFromQueue();
         for (ClassDeclaration classDeclaration : program.getClasses()){
+//            System.out.println("hello");
             classDeclaration.accept(this);
         }
         SymbolTable.pop();
