@@ -16,7 +16,7 @@ public class IllegalAccessToMember extends TypeCheckException {
     @Override
     public void emit_error_message() {
 
-        error_message = "Illegal access to " + member_type + " " + member_name + " of an object of Class " + class_name;
+        error_message = "Illegal access to " + member_type + " " + member_name + " of an object of class " + class_name;
         System.out.println("Error:Line:" + line + ":" + error_message);
 
     }

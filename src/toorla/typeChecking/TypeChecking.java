@@ -111,7 +111,7 @@ public class TypeChecking implements Visitor<Type> {
         Type expr_type = printStat.getArg().accept(this);
         try{
             String str = expr_type.toString();
-            if (!str.equals(INT_TYPE)&& !str.equals(STR_TYPE) && !str.equals(INT_ARRAY))
+            if (!str.equals(INT_TYPE)&& !str.equals(STR_TYPE) && !str.equals(INT_ARRAY) && !str.equals(UNDEFINED_TYPE))
                 throw new PrintArgException(printStat.line, printStat.col);
         }
         catch (TypeCheckException exception){
@@ -516,6 +516,8 @@ public class TypeChecking implements Visitor<Type> {
     @Override
     public Type visit(MethodCall methodCall) {
         Type instance_type = methodCall.getInstance().accept(this);
+        boolean flag = is_using_self_or_nothing(methodCall.getInstance());
+
         try {
             String class_name = ((UserDefinedType) instance_type).getClassDeclaration().getName().getName();
             ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + class_name);
@@ -536,7 +538,7 @@ public class TypeChecking implements Visitor<Type> {
                     }
                     i++;
                 }
-                if ( method.getAccessModifier().toString().equals(public_access) || is_subtype(class_name, current_class.getName().getName()) ){
+                if ( method.getAccessModifier().toString().equals(public_access) || ( is_subtype(class_name, current_class.getName().getName()) && flag ) ){
                     return method.getReturnType();  // PUBLIC or (Private and subClass)
                 }else{
                     try{
@@ -664,9 +666,20 @@ public class TypeChecking implements Visitor<Type> {
         return new UndefinedType();
     }
 
+    public boolean is_using_self_or_nothing(Expression e){
+        try {
+            Self testSelf = (Self) e;
+            return true;
+        }catch (Exception e1) {
+            return false;
+        }
+    }
+
     @Override
     public Type visit(FieldCall fieldCall) {
         Type instance_type = fieldCall.getInstance().accept(this);
+
+        boolean flag = is_using_self_or_nothing(fieldCall.getInstance());
 
         if(instance_type.toString().startsWith(ARRAY_TYPE)){
             if(fieldCall.getField().getName().equals("length")){
@@ -688,8 +701,9 @@ public class TypeChecking implements Visitor<Type> {
             ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + class_name);
             try {
                 FieldSymbolTableItem field = (FieldSymbolTableItem) class_symbol_table.getSymbolTable().get(VAR_PREFIX + fieldCall.getField().getName());
-                if ( field.getAccessModifier().toString().equals(public_access) || is_subtype(class_name, current_class.getName().getName()) ){
-                    return field.getVarType();  // PUBLIC or (Private and subClass)
+                if ( field.getAccessModifier().toString().equals(public_access) ||
+                        ( is_subtype(class_name, current_class.getName().getName()) && flag ) ){
+                    return field.getVarType();  // PUBLIC or (Private and subClass when not using new object)
                 }else{
                     try{
                         throw new IllegalAccessToMember(fieldCall.line, fieldCall.col, class_name, "Field", field.getName());

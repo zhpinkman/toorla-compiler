@@ -12,7 +12,7 @@ public class InvalidLoopCondition extends TypeCheckException {
     @Override
     public void emit_error_message() {
 
-        error_message = "Condition type must be bool in " + condition_type + " statements";
+        error_message = "Condition type must be bool in " + condition_type + " statement";
         System.out.println("Error:Line:" + line + ":" + error_message);
 
     }
