@@ -70,7 +70,7 @@ public class TypeChecking implements Visitor<Type> {
         try {
 //            System.out.println(lhs);
 //            System.out.println(rhs);
-            if (classHierarchy.getParentsOfNode(rhs).contains(lhs) || lhs.equals(rhs)){
+            if (lhs.equals(rhs) || classHierarchy.getParentsOfNode(rhs).contains(lhs) ){
 //                System.out.println(true);
                 return true;
             }
@@ -82,7 +82,12 @@ public class TypeChecking implements Visitor<Type> {
         catch (Exception exception){
             //System.out.println("wow");
         }
-        return true; // it may have been undefined
+
+        if(lhs.equals(UNDEFINED_TYPE) || rhs.equals(UNDEFINED_TYPE)){
+            return true;// it may have been undefined
+        }else {
+            return false;
+        }
     }
 
     private Boolean is_not_primitive(Type type){
@@ -223,6 +228,7 @@ public class TypeChecking implements Visitor<Type> {
 //            System.out.println(returnStat.getReturnedExpr().accept(this).toString());
 //            System.out.println(method_return_type);
             Type return_type = returnStat.getReturnedExpr().accept(this);
+
             if (!is_subtype(method_return_type.toString(), return_type.toString()) && !return_type.toString().equals(UNDEFINED_TYPE) )
                 throw new InvalidReturnType(returnStat.line, returnStat.col, method_return_type.toStringForError());
         }
@@ -516,6 +522,7 @@ public class TypeChecking implements Visitor<Type> {
     @Override
     public Type visit(MethodCall methodCall) {
         Type instance_type = methodCall.getInstance().accept(this);
+
         boolean flag = is_using_self_or_nothing(methodCall.getInstance());
 
         try {
@@ -628,7 +635,7 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(NewArray newArray) {
         Type index_type = newArray.getLength().accept(this);
 
-        if(!index_type.toString().equals(INT_TYPE)){
+        if(!index_type.toString().equals(INT_TYPE) && !index_type.toString().equals(UNDEFINED_TYPE)){
             try{
                 throw new InvalidArraySize(newArray.line, newArray.col);
             }catch (InvalidArraySize e){
