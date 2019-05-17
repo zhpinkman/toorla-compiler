@@ -15,7 +15,10 @@ public class ToorlaCompiler {
         nameAnalyzer.analyze();
 
         TypeChecking tc = new TypeChecking(toorlaASTCode);
-        tc.check();
+        if(tc.check())
+            System.out.println("No error detected");
+
+
 
         //toorlaASTCode.type_check(SymbolTable.root);
 

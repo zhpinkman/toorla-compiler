@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TypeChecking implements Visitor<Type> {
+    private boolean type_check = true;
     private Program program;
     private Graph<String> classHierarchy;
     private static int loop_depth;
@@ -103,12 +104,12 @@ public class TypeChecking implements Visitor<Type> {
         loop_depth = 0;
     }
 
-    public void check(){
+    public boolean check(){
         ClassParentshipExtractorPass classParentshipExtractorPass = new ClassParentshipExtractorPass();
         classParentshipExtractorPass.analyze( program );
         classHierarchy = classParentshipExtractorPass.getResult();
         this.visit(program);
-
+        return type_check;
     }
 
     @Override
@@ -192,6 +193,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidLoopCondition(conditional.getCondition().line, conditional.getCondition().col, conditional.toString());
             }
         }catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
         }
         SymbolTable.pushFromQueue();
@@ -215,6 +217,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidLoopCondition(whileStat.line, whileStat.col, whileStat.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
         }
         loop_depth --;
@@ -233,6 +236,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidReturnType(returnStat.line, returnStat.col, method_return_type.toStringForError());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
         }
         return new VoidType();
@@ -245,6 +249,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new IllegalLoopStatementActions(breakStat.line, breakStat.col, "Break");
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
         }
         return new VoidType();
@@ -257,6 +262,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new IllegalLoopStatementActions(continueStat.line, continueStat.col, "Continue");
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
         }
         return new VoidType();
@@ -296,11 +302,13 @@ public class TypeChecking implements Visitor<Type> {
                 try {
                     throw new InvalidOperationOperands(incStatement.line, incStatement.col, incStatement.toString());
                 } catch (InvalidOperationOperands e) {
+                    type_check = false;
                     e.emit_error_message();
                 }
             }
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
         }
         return new VoidType();
@@ -317,11 +325,13 @@ public class TypeChecking implements Visitor<Type> {
                 try {
                     throw new InvalidOperationOperands(decStatement.line, decStatement.col, decStatement.toString());
                 } catch (InvalidOperationOperands e) {
+                    type_check = false;
                     e.emit_error_message();
                 }
             }
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
         }
         return new VoidType();
@@ -338,6 +348,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(plusExpr.line, plusExpr.col, plusExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -355,6 +366,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(minusExpr.line, minusExpr.col,minusExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -371,6 +383,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(timesExpr.line, timesExpr.col, timesExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -387,6 +400,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(divExpr.line, divExpr.col, divExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -404,6 +418,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(moduloExpr.line, moduloExpr.col, moduloExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -419,6 +434,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands( equalsExpr.line,  equalsExpr.col, equalsExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -435,6 +451,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(gtExpr.line, gtExpr.col, gtExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -451,6 +468,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(lessThanExpr.line, lessThanExpr.col, lessThanExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -468,6 +486,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(andExpr.line, andExpr.col, andExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -485,6 +504,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(orExpr.line, orExpr.col, orExpr.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -499,6 +519,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(negExpr.line, negExpr.col, negExpr.toString());
         }
         catch(TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -513,6 +534,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(notExpr.line, notExpr.col, notExpr.toString());
         }
         catch(TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
             return new UndefinedType();
         }
@@ -551,6 +573,7 @@ public class TypeChecking implements Visitor<Type> {
                     try{
                         throw new IllegalAccessToMember(methodCall.line, methodCall.col, class_name, "Method", method.getName());
                     }catch (IllegalAccessToMember ie){
+                        type_check = false;
                         ie.emit_error_message();
                     }
                 }
@@ -559,6 +582,7 @@ public class TypeChecking implements Visitor<Type> {
                 try{
                     throw new InvalidMethodCall(methodCall.line, methodCall.col, class_name, methodCall.getMethodName().getName());
                 }catch (InvalidMethodCall ie){
+                    type_check = false;
                     ie.emit_error_message();
                 }
             }
@@ -570,6 +594,7 @@ public class TypeChecking implements Visitor<Type> {
                     throw new InvalidOperationOperands(methodCall.line, methodCall.col, methodCall.toString());
                 }
             }catch (InvalidOperationOperands io){
+                type_check = false;
                 io.emit_error_message();
             }
         }
@@ -611,6 +636,7 @@ public class TypeChecking implements Visitor<Type> {
             throw new InvalidVariableCall(identifier.line, identifier.col, identifier.getName());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
         }
 
@@ -639,6 +665,7 @@ public class TypeChecking implements Visitor<Type> {
             try{
                 throw new InvalidArraySize(newArray.line, newArray.col);
             }catch (InvalidArraySize e){
+                type_check = false;
                 e.emit_error_message();
             }
         }
@@ -667,6 +694,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidClassName(newClassInstance.line, newClassInstance.col, newClassInstance.getClassName().getName());
             }
             catch (TypeCheckException exc){
+                type_check = false;
                 exc.emit_error_message();
             }
         }
@@ -697,6 +725,7 @@ public class TypeChecking implements Visitor<Type> {
                         throw new InvalidOperationOperands(fieldCall.line, fieldCall.col, fieldCall.toString());
                     }
                 }catch (InvalidOperationOperands io){
+                    type_check = false;
                     io.emit_error_message();
                 }
                 return new UndefinedType();
@@ -715,6 +744,7 @@ public class TypeChecking implements Visitor<Type> {
                     try{
                         throw new IllegalAccessToMember(fieldCall.line, fieldCall.col, class_name, "Field", field.getName());
                     }catch (IllegalAccessToMember ie){
+                        type_check = false;
                         ie.emit_error_message();
                     }
                 }
@@ -723,6 +753,7 @@ public class TypeChecking implements Visitor<Type> {
                 try{
                     throw new InvalidFieldCall(fieldCall.line, fieldCall.col, class_name, fieldCall.getField().getName());
                 }catch (InvalidFieldCall ie){
+                    type_check = false;
                     ie.emit_error_message();
                 }
             }
@@ -734,6 +765,7 @@ public class TypeChecking implements Visitor<Type> {
                     throw new InvalidOperationOperands(fieldCall.line, fieldCall.col, fieldCall.toString());
                 }
             }catch (InvalidOperationOperands io){
+                type_check = false;
                 io.emit_error_message();
             }
         }
@@ -777,6 +809,7 @@ public class TypeChecking implements Visitor<Type> {
                 try{
                     throw new InvalidOperationOperands(arrayCall.line, arrayCall.col, arrayCall.toString());
                 }catch (InvalidOperationOperands e){
+                    type_check = false;
                     e.emit_error_message();
                 }
             }
@@ -784,6 +817,7 @@ public class TypeChecking implements Visitor<Type> {
             try{
                 throw new InvalidOperationOperands(arrayCall.line, arrayCall.col, arrayCall.toString());
             }catch (InvalidOperationOperands e){
+                type_check = false;
                 e.emit_error_message();
             }
         }
@@ -800,6 +834,7 @@ public class TypeChecking implements Visitor<Type> {
                 throw new InvalidOperationOperands(notEquals.line, notEquals.col, notEquals.toString());
         }
         catch (TypeCheckException exception){
+            type_check = false;
             exception.emit_error_message();
         }
         return new BoolType();
@@ -825,6 +860,7 @@ public class TypeChecking implements Visitor<Type> {
             MethodSymbolTableItem m = (MethodSymbolTableItem) SymbolTable.top().get("method_main");
         }catch (Exception e){
             System.out.println("Error: Entry class and it's ancestors has no main method");
+            type_check = false;
         }
 
         for (ClassMemberDeclaration classMemberDeclaration: entryClassDeclaration.getClassMembers()){
@@ -904,7 +940,6 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(Program program) {
         SymbolTable.pushFromQueue();
         for (ClassDeclaration classDeclaration : program.getClasses()){
-//            System.out.println("hello");
             classDeclaration.accept(this);
         }
         SymbolTable.pop();
@@ -933,6 +968,7 @@ public class TypeChecking implements Visitor<Type> {
         }
         catch (Exception exception){
             System.out.println("Error:Line:" + line + ":" + "There is no type with name " + type_name);
+            type_check = false;
             return false;
         }
     }
