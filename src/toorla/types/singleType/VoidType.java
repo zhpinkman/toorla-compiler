@@ -5,4 +5,7 @@ public class VoidType extends SingleType {
     public String toString() {
         return "(VoidType)";
     }
+
+    @Override
+    public String toStringForError() { return "void"; }
 }

@@ -28,6 +28,7 @@ import toorla.symbolTable.symbolTableItem.varItems.FieldSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.typeChecking.typeCheckExceptions.*;
 import toorla.types.Type;
+import toorla.types.arrayType.ArrayType;
 import toorla.types.singleType.*;
 import toorla.visitor.Visitor;
 import toorla.utilities.graph.Graph;
@@ -35,6 +36,7 @@ import toorla.utilities.graph.Graph;
 import javax.sound.midi.Soundbank;
 import javax.sound.midi.SysexMessage;
 import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TypeChecking implements Visitor<Type> {
@@ -45,8 +47,9 @@ public class TypeChecking implements Visitor<Type> {
     private String INT_ARRAY = "(ArrayType,IntType)";
     private String STR_TYPE = "(StringType)";
     private String BOOL_TYPE = "(BoolType)";
+    private String ARRAY_TYPE = "(ArrayType,";
     private String UNDEFINED_TYPE = "(UndefinedType)";
-    private String method_return_type = "";
+    private Type method_return_type;
     private String VAR_PREFIX = "var_";
     private String CLASS_PREFIX = "class_";
     private String METHOD_PREFIX = "method_";
@@ -79,7 +82,7 @@ public class TypeChecking implements Visitor<Type> {
         catch (Exception exception){
             System.out.println("wow");
         }
-        return null;
+        return true; // it may have been undefined
     }
 
     private Boolean is_not_primitive(Type type){
@@ -153,7 +156,7 @@ public class TypeChecking implements Visitor<Type> {
         }
         else{
             try{
-                if (lhs.toString() != rhs.toString()) // not sure about arrays and assigning each of them to one another
+                if (!lhs.toString().contains(rhs.toString()) && !rhs.toString().contains(lhs.toString())) // not sure about arrays and assigning each of them to one another
                     throw new LvalueAssignability(assignStat.line, assignStat.col);
             }
             catch (TypeCheckException exception){
@@ -191,7 +194,7 @@ public class TypeChecking implements Visitor<Type> {
         SymbolTable.pushFromQueue();
         conditional.getElseStatement().accept(this);
         SymbolTable.pop();
-        return null;
+        return new VoidType();
     }
 
     @Override
@@ -218,8 +221,9 @@ public class TypeChecking implements Visitor<Type> {
         try {
 //            System.out.println(returnStat.getReturnedExpr().accept(this).toString());
 //            System.out.println(method_return_type);
-            if (!returnStat.getReturnedExpr().accept(this).toString().equals(method_return_type))
-                throw new InvalidReturnType(returnStat.line, returnStat.col);
+            Type return_type = returnStat.getReturnedExpr().accept(this);
+            if (!return_type.toString().equals(method_return_type.toString()))
+                throw new InvalidReturnType(returnStat.line, returnStat.col, method_return_type.toStringForError());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
@@ -231,7 +235,7 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(Break breakStat) {
         try{
             if (loop_depth == 0)
-                throw new IllegalLoopStatementActions(breakStat.line, breakStat.col, breakStat.toString());
+                throw new IllegalLoopStatementActions(breakStat.line, breakStat.col, "Break");
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
@@ -243,7 +247,7 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(Continue continueStat) {
         try{
             if (loop_depth == 0)
-                throw new IllegalLoopStatementActions(continueStat.line, continueStat.col, continueStat.toString());
+                throw new IllegalLoopStatementActions(continueStat.line, continueStat.col, "Continue");
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
@@ -278,7 +282,7 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(IncStatement incStatement) {
         try {
             if (!incStatement.getOperand().lvalue_check(new SymbolTable()))
-                throw new InvalidIncDecOperand(incStatement.line, incStatement.col, incStatement.toString());
+                throw new InvalidIncDecOperand(incStatement.line, incStatement.col, "Inc");
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
@@ -290,7 +294,7 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(DecStatement decStatement) {
         try {
             if (!decStatement.getOperand().lvalue_check(new SymbolTable()))
-                throw new InvalidIncDecOperand(decStatement.line, decStatement.col, decStatement.toString());
+                throw new InvalidIncDecOperand(decStatement.line, decStatement.col, "Dec");
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
@@ -476,20 +480,25 @@ public class TypeChecking implements Visitor<Type> {
             String class_name = ((UserDefinedType) instance_type).getClassDeclaration().getName().getName();
             ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + class_name);
             try {
-                MethodSymbolTableItem method = (MethodSymbolTableItem) class_symbol_table.getSymbolTable().get(VAR_PREFIX + methodCall.getMethodName().getName());
-                if ( method.getAccessModifier().toString().equals(public_access) || is_subtype(class_name, current_class.getName().getName()) ){
-                    int i=0;
-                    for (Expression arg_expr: methodCall.getArgs() ) {
-                        Type arg_type = arg_expr.accept(this);
-                        if(!arg_type.toString().equals(UNDEFINED_TYPE) && !arg_type.toString().equals(method.getArgumentsTypes().get(i).toString()) ){
-                            throw new Exception(); // GOES TO InvalidMethodCall if args doesnt match
-                        }
-                        i++;
+                MethodSymbolTableItem method = (MethodSymbolTableItem) class_symbol_table.getSymbolTable().get(METHOD_PREFIX + methodCall.getMethodName().getName());
+
+                if(method.getArgumentsTypes().size() != methodCall.getArgs().size()) {
+                    throw new Exception();  // GOES TO InvalidMethodCall if args doesnt match
+                }
+                int i=0;
+                for (Expression arg_expr: methodCall.getArgs() ) {
+                    Type arg_type = arg_expr.accept(this);
+
+                    if(!arg_type.toString().equals(UNDEFINED_TYPE) && !method.getArgumentsTypes().get(i).toString().equals(UNDEFINED_TYPE) && !arg_type.toString().equals(method.getArgumentsTypes().get(i).toString()) ){
+                        throw new Exception(); // GOES TO InvalidMethodCall if args doesnt match
                     }
+                    i++;
+                }
+                if ( method.getAccessModifier().toString().equals(public_access) || is_subtype(class_name, current_class.getName().getName()) ){
                     return method.getReturnType();  // PUBLIC or (Private and subClass)
                 }else{
                     try{
-                        throw new IllegalAccessToMember(methodCall.line, methodCall.col, class_name, "METHOD", method.getName());
+                        throw new IllegalAccessToMember(methodCall.line, methodCall.col, class_name, "Method", method.getName());
                     }catch (IllegalAccessToMember ie){
                         ie.emit_error_message();
                     }
@@ -567,7 +576,17 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(NewArray newArray) {
-        return null;
+        Type index_type = newArray.getLength().accept(this);
+
+        if(!index_type.toString().equals(INT_TYPE)){
+            try{
+                throw new InvalidArraySize(newArray.line, newArray.col);
+            }catch (InvalidArraySize e){
+                e.emit_error_message();
+            }
+        }
+
+        return new ArrayType(newArray.getType());
     }
 
     @Override
@@ -600,7 +619,23 @@ public class TypeChecking implements Visitor<Type> {
     @Override
     public Type visit(FieldCall fieldCall) {
         Type instance_type = fieldCall.getInstance().accept(this);
-        try {
+
+        if(instance_type.toString().startsWith(ARRAY_TYPE)){
+            if(fieldCall.getField().getName().equals("length")){
+                return new IntType();
+            }else{
+                try {
+                    if(!instance_type.toString().equals(UNDEFINED_TYPE) ) { // if not undefined
+                        throw new InvalidOperationOperands(fieldCall.line, fieldCall.col, fieldCall.toString());
+                    }
+                }catch (InvalidOperationOperands io){
+                    io.emit_error_message();
+                }
+                return new UndefinedType();
+            }
+        }
+
+        try { // instance type is class
             String class_name = ((UserDefinedType) instance_type).getClassDeclaration().getName().getName();
             ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + class_name);
             try {
@@ -609,7 +644,7 @@ public class TypeChecking implements Visitor<Type> {
                     return field.getVarType();  // PUBLIC or (Private and subClass)
                 }else{
                     try{
-                        throw new IllegalAccessToMember(fieldCall.line, fieldCall.col, class_name, "FIELD", field.getName());
+                        throw new IllegalAccessToMember(fieldCall.line, fieldCall.col, class_name, "Field", field.getName());
                     }catch (IllegalAccessToMember ie){
                         ie.emit_error_message();
                     }
@@ -657,7 +692,33 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(ArrayCall arrayCall) {
-        return null;
+        Type instance_type = arrayCall.getInstance().accept(this);
+        Type index_type = arrayCall.getIndex().accept(this);
+        if(instance_type.toString().equals(UNDEFINED_TYPE)){
+            return new UndefinedType();
+        }
+        if(index_type.toString().equals(UNDEFINED_TYPE)){
+            return instance_type;
+        }
+        if( instance_type.toString().startsWith("(ArrayType,") ){
+            if(index_type.toString().equals(INT_TYPE) ){
+                return instance_type;
+            }else{
+                //index is not int
+                try{
+                    throw new InvalidOperationOperands(arrayCall.line, arrayCall.col, arrayCall.toString());
+                }catch (InvalidOperationOperands e){
+                    e.emit_error_message();
+                }
+            }
+        }else{
+            try{
+                throw new InvalidOperationOperands(arrayCall.line, arrayCall.col, arrayCall.toString());
+            }catch (InvalidOperationOperands e){
+                e.emit_error_message();
+            }
+        }
+        return new UndefinedType();
     }
 
     @Override
@@ -699,44 +760,38 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(FieldDeclaration fieldDeclaration) {
-        String type_name = "";
-        String hard_type = fieldDeclaration.getType().toString();
-        try {
-            if (hard_type.equals(INT_TYPE) || hard_type.equals("(BoolType)") || hard_type.equals(STR_TYPE))
-                return new VoidType();
-            int index_of_name = hard_type.indexOf(',');
-            type_name = hard_type.substring(index_of_name + 1, hard_type.length() - 1);
-            SymbolTable.top().get("class_" + type_name);
+
+        if(!is_type_declared(fieldDeclaration.getType())){
+            System.out.println("Error:Line:" + fieldDeclaration.line + ":" + "There is no type with name " + fieldDeclaration.getType().toString());
         }
-        catch (Exception exception){
-            System.out.println("Error:Line:" + fieldDeclaration.line + ":" + "There is no type with name " + type_name);
-        }
-        return null;
+
+        return new VoidType();
     }
 
     @Override
     public Type visit(ParameterDeclaration parameterDeclaration) {
-        return null;
+        var_index++;
+        Type t = parameterDeclaration.getType();
+        if(!is_type_declared(t)){
+            System.out.println("Error:Line:" + parameterDeclaration.line + ":" + "There is no type with name " + t.toString());
+        }
+        return new VoidType();
     }
 
     @Override
     public Type visit(MethodDeclaration methodDeclaration) {
 //        System.out.println(methodDeclaration);
-        method_return_type = methodDeclaration.getReturnType().toString(); // setting return type of the method declaration
+        method_return_type = methodDeclaration.getReturnType(); // setting return type of the method declaration
 
         var_index = 0;
 
         String type_name = methodDeclaration.getReturnType().toString();
-
-        try {
-            if (!type_name.equals(INT_TYPE) && !type_name.equals(BOOL_TYPE) && !type_name.equals(STR_TYPE)) {
-                int index_of_name = type_name.indexOf(',');
-                type_name = type_name.substring(index_of_name + 1, type_name.length() - 1);
-
-            }
-        }
-        catch (Exception exception){
+        if(!is_type_declared(methodDeclaration.getReturnType())){
             System.out.println("Error:Line:" + methodDeclaration.line + ":" + "There is no type with name " + type_name);
+        }
+
+        for (ParameterDeclaration p: methodDeclaration.getArgs()) {
+            p.accept(this);
         }
         SymbolTable.pushFromQueue();
         for (Statement statement: methodDeclaration.getBody()){
@@ -753,7 +808,7 @@ public class TypeChecking implements Visitor<Type> {
         for (LocalVarDef lvd: localVarsDefinitions.getVarDefinitions()) {
             lvd.accept(this);
         }
-        return null;
+        return new VoidType();
     }
 
     @Override
@@ -765,6 +820,31 @@ public class TypeChecking implements Visitor<Type> {
         }
         SymbolTable.pop();
         return new VoidType();
+    }
+
+
+
+
+    public  boolean is_type_declared(Type t){
+        String type_name;
+        String hard_type = t.toString();
+        try {
+            try{
+                ArrayType fa = (ArrayType) t;
+                hard_type = fa.getSingleType().toString();
+            }catch (Exception e){
+            }
+
+            if (hard_type.equals(INT_TYPE) || hard_type.equals(BOOL_TYPE) || hard_type.equals(STR_TYPE))
+                return true;
+            int index_of_name = hard_type.indexOf(',');
+            type_name = hard_type.substring(index_of_name + 1, hard_type.length() - 1);
+            SymbolTable.top().get("class_" + type_name);
+            return true;
+        }
+        catch (Exception exception){
+            return false;
+        }
     }
 
 }

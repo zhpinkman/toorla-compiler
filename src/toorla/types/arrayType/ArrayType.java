@@ -22,4 +22,6 @@ public class ArrayType extends Type {
     public String toString() {
         return "(ArrayType," + singleType.toString() + ")";
     }
+    @Override
+    public String toStringForError() { return "arrray[" + singleType.toStringForError() + "]"; }
 }

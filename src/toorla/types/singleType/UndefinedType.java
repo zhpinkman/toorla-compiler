@@ -7,4 +7,8 @@ public class UndefinedType extends Type {
     public String toString() {
         return "(UndefinedType)";
     }
+    @Override
+    public String toStringForError() {
+        return "undefinedType";
+    }
 }

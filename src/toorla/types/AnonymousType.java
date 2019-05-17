@@ -5,4 +5,8 @@ public class AnonymousType extends Type {
     public String toString() {
         return "(Anonymous)";
     }
+    @Override
+    public String toStringForError() {
+        return "anonymous";
+    }
 }

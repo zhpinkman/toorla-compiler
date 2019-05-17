@@ -5,4 +5,8 @@ public class StringType extends SingleType {
     public String toString() {
         return "(StringType)";
     }
+    @Override
+    public String toStringForError() {
+        return "string";
+    }
 }

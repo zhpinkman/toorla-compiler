@@ -40,8 +40,9 @@ public class ArrayCall extends Expression {
 
     @Override
     public Boolean lvalue_check(SymbolTable symbolTable) {
-        if (instance.lvalue_check(symbolTable))
-            return true;
-        else return false;
+//        if (instance.lvalue_check(symbolTable))
+//            return true;
+//        else return false;
+        return true;
     }
 }

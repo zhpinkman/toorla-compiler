@@ -5,4 +5,8 @@ public class IntType extends SingleType {
     public String toString() {
         return "(IntType)";
     }
+    @Override
+    public String toStringForError() {
+        return "int";
+    }
 }

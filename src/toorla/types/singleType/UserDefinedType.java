@@ -22,5 +22,9 @@ public class UserDefinedType extends SingleType {
         return "(UserDefined," + typeClass.getName().getName() + ")";
     }
 
+    @Override
+    public String toStringForError() {
+        return typeClass.getName().getName();
+    }
 
 }

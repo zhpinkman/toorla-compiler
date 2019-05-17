@@ -13,7 +13,7 @@ public class IllegalLoopStatementActions extends TypeCheckException {
     @Override
     public void emit_error_message() {
 
-        error_message = "Invalid use of " + action + "," + action + " must be used as loop statement";
+        error_message = "Invalid use of " + action + ", " + action + " must be used as loop statement";
 
         System.out.println("Error:Line:" + line + ":" + error_message);
 
