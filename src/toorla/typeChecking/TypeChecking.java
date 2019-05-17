@@ -37,6 +37,7 @@ import javax.sound.midi.Soundbank;
 import javax.sound.midi.SysexMessage;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TypeChecking implements Visitor<Type> {
@@ -71,6 +72,15 @@ public class TypeChecking implements Visitor<Type> {
         try {
 //            System.out.println(lhs);
 //            System.out.println(rhs);
+
+            int index;
+            index = lhs.indexOf(',');
+            if(index != -1) {
+                lhs = lhs.substring(index + 1, lhs.length() - 1);
+                index = rhs.indexOf(',');
+                rhs = rhs.substring(index + 1, rhs.length() - 1);
+            }
+            Collection<String> a = classHierarchy.getParentsOfNode(rhs);
             if (lhs.equals(rhs) || classHierarchy.getParentsOfNode(rhs).contains(lhs) ){
 //                System.out.println(true);
                 return true;
@@ -843,6 +853,16 @@ public class TypeChecking implements Visitor<Type> {
     @Override
     public Type visit(ClassDeclaration classDeclaration) {
         current_class = classDeclaration;
+        String class_name = classDeclaration.getName().getName();
+        try{
+            Collection<String> a = classHierarchy.getParentsOfNode(class_name);
+            if(classHierarchy.getParentsOfNode(class_name).contains(class_name) == true){
+                type_check = false;
+                System.out.println("Error: There is cycle in inheritance");
+            }
+        }catch (Exception e){
+
+        }
         SymbolTable.pushFromQueue();
         for (ClassMemberDeclaration classMemberDeclaration: classDeclaration.getClassMembers()){
             classMemberDeclaration.accept(this);
