@@ -44,6 +44,7 @@ public class TypeChecking implements Visitor<Type> {
     private String INT_ARRAY = "(ArrayType,IntType)";
     private String STR_TYPE = "(StringType)";
     private String BOOL_TYPE = "(BoolType)";
+    private String UNDEFINED_TYPE = "(UndefinedType)";
     private String method_return_type = "";
     private String VAR_PREFIX = "var_";
     private String CLASS_PREFIX = "class_";
@@ -61,7 +62,7 @@ public class TypeChecking implements Visitor<Type> {
     private static final String ARRAY_CALLING = "ARRAY_CALLING_ID";
     private String who_is_calling_identifier = VARIABLE_CALLING;
 
-    public Boolean is_subtype(String lhs, String rhs){
+    private Boolean is_subtype(String lhs, String rhs){ //rhs is subtype of lhs // lhs is father
         try {
 //            System.out.println(lhs);
 //            System.out.println(rhs);
@@ -80,7 +81,7 @@ public class TypeChecking implements Visitor<Type> {
         return null;
     }
 
-    public Boolean is_not_primitive(Type type){
+    private Boolean is_not_primitive(Type type){
         if (type.toString() != INT_TYPE && type.toString() != STR_TYPE && type.toString() != BOOL_TYPE
         && !type.toString().startsWith("(ArrayType,"))
             return true;
@@ -178,7 +179,7 @@ public class TypeChecking implements Visitor<Type> {
         Type cond = conditional.getCondition().accept(this);
         try {
             if (!cond.toString().equals("(BoolType)")) {
-                throw new InvalidLoopCondition(conditional.line, conditional.col, conditional.toString());
+                throw new InvalidLoopCondition(conditional.getCondition().line, conditional.getCondition().col, conditional.toString());
             }
         }catch (TypeCheckException exception){
             exception.emit_error_message();
@@ -483,70 +484,25 @@ public class TypeChecking implements Visitor<Type> {
 //        System.out.println("here");
         SymbolTable s = new SymbolTable().top();
 
-        switch (who_is_calling_identifier){
-            case VARIABLE_CALLING: {
-                try {
-                    LocalVariableSymbolTableItem var_item = (LocalVariableSymbolTableItem) SymbolTable.top().get("var_" + identifier.getName());
-                    if (var_item.getIndex() <= var_index) {
-                        Type type = var_item.getInital_value();
+
+        try {
+            LocalVariableSymbolTableItem var_item = (LocalVariableSymbolTableItem) SymbolTable.top().get("var_" + identifier.getName());
+            if (var_item.getIndex() <= var_index) {
+                return var_item.getInital_value();
 //                System.out.println(type);
-                        return type;
-                    }
-//            System.out.println(var_index);
-                } catch (Exception exception) {
-//                    try {
-//                        throw new InvalidVariableCall(identifier.line, identifier.col, identifier.getName());
-//                    } catch (TypeCheckException e) {
-//                        e.emit_error_message();
-//                    }
-                }
-
-                try {
-                    FieldSymbolTableItem field_item = (FieldSymbolTableItem) SymbolTable.top().get("var_" + identifier.getName());
-                    return field_item.getVarType();
-                } catch (Exception exception) {
-                    System.out.println("error about couldn't finding variable or field"); // not sure which error to emit
-                    return new UndefinedType();
-                }
             }
-
-            case FIELD_CALLING:
-                who_is_calling_identifier = VARIABLE_CALLING;
-                try {
-                    FieldSymbolTableItem field_item = (FieldSymbolTableItem) SymbolTable.top().get("var_" + identifier.getName());
-                    return field_item.getVarType();
-                }
-                catch (Exception exception){
-                    return new UndefinedType();
-                }
-
-            case METHOD_CALLING:
-                who_is_calling_identifier = VARIABLE_CALLING;
-                try{
-                    MethodSymbolTableItem method_item = (MethodSymbolTableItem) SymbolTable.top().get("method_" + identifier.getName());
-                }
-                catch (Exception e){
-
-                }
-
-
-            case CLASS_CALLING:
-                who_is_calling_identifier = VARIABLE_CALLING;
-//                System.out.println("zzz");
-                try{
-                    ClassSymbolTableItem class_item = (ClassSymbolTableItem) SymbolTable.top().get("class_" + identifier.getName());
-//                    System.out.println("ttt");
-                }
-                catch (Exception e){
-                    try{
-                        throw new InvalidClassName(identifier.line, identifier.col, identifier.getName());
-                    }catch (InvalidClassName e2){
-                        e2.emit_error_message();
-                    }
-                }
+//            System.out.println(var_index);
+        } catch (Exception exception) {
+            //
         }
 
-
+        try {
+            FieldSymbolTableItem field_item = (FieldSymbolTableItem) SymbolTable.top().get("var_" + identifier.getName());
+            return field_item.getVarType();
+        } catch (Exception exception) {
+            //Field call is being handled int it's node, if there is no a.b we assume it was variable we were searching for
+            //System.out.println("error about couldn't finding variable or field"); // not sure which error to emit
+        }
 
 
         try {
@@ -556,13 +512,13 @@ public class TypeChecking implements Visitor<Type> {
             exception.emit_error_message();
         }
 
-        return null;
+        return new UndefinedType();
     }
 
     @Override
     public Type visit(Self self) {
 //        System.out.println("here");
-        return null;
+        return new UserDefinedType(current_class);
     }
 
     @Override
@@ -604,55 +560,59 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(FieldCall fieldCall) {
+        Type instance_type = fieldCall.getInstance().accept(this);
         try {
-//            System.out.println("and here");
-//            System.out.println(fieldCall.getInstance().toString());
-
-            String class_name = ((UserDefinedType) fieldCall.getInstance().accept(this)).getClassDeclaration().getName().getName();
-//            System.out.println("here too");
+            String class_name = ((UserDefinedType) instance_type).getClassDeclaration().getName().getName();
             ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + class_name);
-//            System.out.println("test");
             try {
                 FieldSymbolTableItem field = (FieldSymbolTableItem) class_symbol_table.getSymbolTable().get(VAR_PREFIX + fieldCall.getField().getName());
-//                System.out.println(field.getVarType());
-//                System.out.println(public_access);
-//                System.out.println(field.getAccessModifier());
-                if (field.getAccessModifier().toString().equals(public_access)){
-                    return field.getVarType(); // PRIVATE TODO
+                if ( field.getAccessModifier().toString().equals(public_access) || is_subtype(class_name, current_class.getName().getName()) ){
+                    return field.getVarType();  // PUBLIC or (Private and subClass)
+                }else{
+                    try{
+                        throw new IllegalAccessToMember(fieldCall.line, fieldCall.col, class_name, "FIELD", field.getName());
+                    }catch (IllegalAccessToMember ie){
+                        ie.emit_error_message();
+                    }
                 }
-
-                else
-                    throw new IllegalAccessToMember(fieldCall.line, fieldCall.col, class_name, "FIELD", field.getName());
 //                System.out.println("tested");
             }catch (Exception  exception){
-
-            }
-            who_is_calling_identifier = FIELD_CALLING;
-            Type field_type = fieldCall.getField().accept(this);
-            return field_type;
-        }
-
-        catch (Exception e){
-
-        }
-        try {
-            if (fieldCall.getInstance().toString().equals("(Self)")) {
-//                System.out.println("zzz");
-//                System.out.println(current_class.getName().getName());
-//                System.out.println(CLASS_PREFIX + current_class.getName().getName());
-                ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + current_class.getName().getName());
-//                System.out.println("test");
-                try {
-                    FieldSymbolTableItem field = (FieldSymbolTableItem) class_symbol_table.getSymbolTable().get(VAR_PREFIX + fieldCall.getField().getName());
-//                    System.out.println(field.getVarType());
-                    return field.getVarType();
+                try{
+                    throw new InvalidFieldCall(fieldCall.line, fieldCall.col, class_name, fieldCall.getField().getName());
+                }catch (InvalidFieldCall ie){
+                    ie.emit_error_message();
                 }
-                catch (Exception exception){}
             }
         }
-        catch (Exception exception){
-
+        catch (Exception e){
+            //Error for when field call instance was not found or was not a class.
+            try {
+                if(!instance_type.toString().equals(UNDEFINED_TYPE) ) { // if not undefined
+                    throw new InvalidOperationOperands(fieldCall.line, fieldCall.col, fieldCall.toString());
+                }
+            }catch (InvalidOperationOperands io){
+                io.emit_error_message();
+            }
         }
+
+//        try {
+//            if (fieldCall.getInstance().toString().equals("(Self)")) {
+////                System.out.println("zzz");
+////                System.out.println(current_class.getName().getName());
+////                System.out.println(CLASS_PREFIX + current_class.getName().getName());
+//                ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + current_class.getName().getName());
+////                System.out.println("test");
+//                try {
+//                    FieldSymbolTableItem field = (FieldSymbolTableItem) class_symbol_table.getSymbolTable().get(VAR_PREFIX + fieldCall.getField().getName());
+////                    System.out.println(field.getVarType());
+//                    return field.getVarType();
+//                }
+//                catch (Exception exception){}
+//            }
+//        }
+//        catch (Exception exception){
+//
+//        }
         return new UndefinedType();
     }
 

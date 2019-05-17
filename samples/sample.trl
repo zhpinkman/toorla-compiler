@@ -1,10 +1,17 @@
-entry class Sample1 :
-    public field v int;
+entry class Sample1 inherits sss2 :
+    public field v sss;
+    public field v23 int;
     public field vvv int;
     function main() returns int :
-        var i = "aa";
-        if( v )
+        var i = new sss();
+        var t = i;
+        if( self.f )
             i++;
 
     end
+end
+
+class sss:
+    private field v2 sss;
+    private field v3 int;
 end

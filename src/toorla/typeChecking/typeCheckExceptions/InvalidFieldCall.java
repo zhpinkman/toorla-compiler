@@ -2,8 +2,8 @@ package toorla.typeChecking.typeCheckExceptions;
 
 public class InvalidFieldCall extends TypeCheckException {
 
-    String field_name;
-    String class_name;
+    private String field_name;
+    private String class_name;
 
     public InvalidFieldCall(int line, int column, String class_name, String field_name) {
         super(line, column);
@@ -15,7 +15,7 @@ public class InvalidFieldCall extends TypeCheckException {
     @Override
     public void emit_error_message() {
 
-        error_message = "There is no Field with name " + field_name + " with in\n" +
+        error_message = "There is no Field with name " + field_name + " with in " +
                 "class " + class_name;
         System.out.println("Error:Line:" + line + ":" + error_message);
 
