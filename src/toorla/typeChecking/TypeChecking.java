@@ -86,7 +86,7 @@ public class TypeChecking implements Visitor<Type> {
     }
 
     private Boolean is_not_primitive(Type type){
-        if (type.toString() != INT_TYPE && type.toString() != STR_TYPE && type.toString() != BOOL_TYPE
+        if (!type.toString().equals(INT_TYPE) && !type.toString().equals(STR_TYPE) && !type.toString().equals(BOOL_TYPE)
         && !type.toString().startsWith("(ArrayType,"))
             return true;
         else
@@ -574,7 +574,7 @@ public class TypeChecking implements Visitor<Type> {
     @Override
     public Type visit(Identifier identifier) {
 //        System.out.println("here");
-        SymbolTable s = new SymbolTable().top();
+        //SymbolTable s = new SymbolTable().top();
 
 
         try {
@@ -666,7 +666,7 @@ public class TypeChecking implements Visitor<Type> {
         return new UndefinedType();
     }
 
-    public boolean is_using_self_or_nothing(Expression e){
+    private boolean is_using_self_or_nothing(Expression e){
         try {
             Self testSelf = (Self) e;
             return true;
@@ -900,7 +900,7 @@ public class TypeChecking implements Visitor<Type> {
 
 
 
-    public  boolean is_type_declared(Type t, int line){
+    private  boolean is_type_declared(Type t, int line){
         String type_name = t.toString();
         String hard_type = t.toString();
         try {
