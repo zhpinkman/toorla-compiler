@@ -80,7 +80,7 @@ public class TypeChecking implements Visitor<Type> {
             }
         }
         catch (Exception exception){
-            System.out.println("wow");
+            //System.out.println("wow");
         }
         return true; // it may have been undefined
     }
@@ -182,7 +182,8 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(Conditional conditional) {
         Type cond = conditional.getCondition().accept(this);
         try {
-            if (!cond.toString().equals("(BoolType)")) {
+            if (!cond.toString().equals("(BoolType)") && !cond.toString().equals(UNDEFINED_TYPE)) {
+
                 throw new InvalidLoopCondition(conditional.getCondition().line, conditional.getCondition().col, conditional.toString());
             }
         }catch (TypeCheckException exception){
@@ -222,7 +223,7 @@ public class TypeChecking implements Visitor<Type> {
 //            System.out.println(returnStat.getReturnedExpr().accept(this).toString());
 //            System.out.println(method_return_type);
             Type return_type = returnStat.getReturnedExpr().accept(this);
-            if (!return_type.toString().equals(method_return_type.toString()))
+            if (!return_type.toString().equals(method_return_type.toString()) && !return_type.toString().equals(UNDEFINED_TYPE) )
                 throw new InvalidReturnType(returnStat.line, returnStat.col, method_return_type.toStringForError());
         }
         catch (TypeCheckException exception){
@@ -283,6 +284,15 @@ public class TypeChecking implements Visitor<Type> {
         try {
             if (!incStatement.getOperand().lvalue_check(new SymbolTable()))
                 throw new InvalidIncDecOperand(incStatement.line, incStatement.col, "Inc");
+
+            Type op_type = incStatement.getOperand().accept(this);
+            if( !op_type.toString().equals(INT_TYPE) && !op_type.toString().equals(UNDEFINED_TYPE) ) {
+                try {
+                    throw new InvalidOperationOperands(incStatement.line, incStatement.col, incStatement.toString());
+                } catch (InvalidOperationOperands e) {
+                    e.emit_error_message();
+                }
+            }
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
@@ -295,6 +305,15 @@ public class TypeChecking implements Visitor<Type> {
         try {
             if (!decStatement.getOperand().lvalue_check(new SymbolTable()))
                 throw new InvalidIncDecOperand(decStatement.line, decStatement.col, "Dec");
+
+            Type op_type = decStatement.getOperand().accept(this);
+            if( !op_type.toString().equals(INT_TYPE) && !op_type.toString().equals(UNDEFINED_TYPE) ) {
+                try {
+                    throw new InvalidOperationOperands(decStatement.line, decStatement.col, decStatement.toString());
+                } catch (InvalidOperationOperands e) {
+                    e.emit_error_message();
+                }
+            }
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
@@ -308,11 +327,13 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = plusExpr.getLhs().accept(this);
         Type second_operand_type = plusExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals(INT_TYPE)  || !second_operand_type.toString().equals(INT_TYPE))
+            if  ( (!first_operand_type.toString().equals(INT_TYPE)&&!first_operand_type.toString().equals(UNDEFINED_TYPE) ) ||
+                    (!second_operand_type.toString().equals(INT_TYPE)&&!second_operand_type.toString().equals(UNDEFINED_TYPE)) )
                 throw new InvalidOperationOperands(plusExpr.line, plusExpr.col, plusExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new IntType();
     }
@@ -323,11 +344,13 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = minusExpr.getLhs().accept(this);
         Type second_operand_type = minusExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
+            if  ( (!first_operand_type.toString().equals(INT_TYPE)&&!first_operand_type.toString().equals(UNDEFINED_TYPE) ) ||
+                    (!second_operand_type.toString().equals(INT_TYPE)&&!second_operand_type.toString().equals(UNDEFINED_TYPE)) )
                 throw new InvalidOperationOperands(minusExpr.line, minusExpr.col,minusExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new IntType();
     }
@@ -337,11 +360,13 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = timesExpr.getLhs().accept(this);
         Type second_operand_type = timesExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
+            if  ( (!first_operand_type.toString().equals(INT_TYPE)&&!first_operand_type.toString().equals(UNDEFINED_TYPE) ) ||
+                    (!second_operand_type.toString().equals(INT_TYPE)&&!second_operand_type.toString().equals(UNDEFINED_TYPE)) )
                 throw new InvalidOperationOperands(timesExpr.line, timesExpr.col, timesExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new IntType();
     }
@@ -351,11 +376,13 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = divExpr.getLhs().accept(this);
         Type second_operand_type = divExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
+            if  ( (!first_operand_type.toString().equals(INT_TYPE)&&!first_operand_type.toString().equals(UNDEFINED_TYPE) ) ||
+                    (!second_operand_type.toString().equals(INT_TYPE)&&!second_operand_type.toString().equals(UNDEFINED_TYPE)) )
                 throw new InvalidOperationOperands(divExpr.line, divExpr.col, divExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new IntType();
     }
@@ -366,11 +393,13 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = moduloExpr.getLhs().accept(this);
         Type second_operand_type = moduloExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
+            if  ( (!first_operand_type.toString().equals(INT_TYPE)&&!first_operand_type.toString().equals(UNDEFINED_TYPE) ) ||
+                    (!second_operand_type.toString().equals(INT_TYPE)&&!second_operand_type.toString().equals(UNDEFINED_TYPE)) )
                 throw new InvalidOperationOperands(moduloExpr.line, moduloExpr.col, moduloExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new IntType();
     }
@@ -380,11 +409,12 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type =  equalsExpr.getLhs().accept(this);
         Type second_operand_type =  equalsExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals(second_operand_type.toString()) )
+            if (!first_operand_type.toString().equals(second_operand_type.toString()) &&  !first_operand_type.toString().equals(UNDEFINED_TYPE) && !second_operand_type.toString().equals(UNDEFINED_TYPE)  )
                 throw new InvalidOperationOperands( equalsExpr.line,  equalsExpr.col, equalsExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new BoolType();
     }
@@ -394,11 +424,13 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = gtExpr.getLhs().accept(this);
         Type second_operand_type = gtExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
+            if ( (!first_operand_type.toString().equals(INT_TYPE)&&!first_operand_type.toString().equals(UNDEFINED_TYPE) ) ||
+                    (!second_operand_type.toString().equals(INT_TYPE)&&!second_operand_type.toString().equals(UNDEFINED_TYPE)) )
                 throw new InvalidOperationOperands(gtExpr.line, gtExpr.col, gtExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new BoolType();
     }
@@ -408,11 +440,13 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = lessThanExpr.getLhs().accept(this);
         Type second_operand_type = lessThanExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals(INT_TYPE) || !second_operand_type.toString().equals(INT_TYPE))
+            if ( (!first_operand_type.toString().equals(INT_TYPE)&&!first_operand_type.toString().equals(UNDEFINED_TYPE) ) ||
+                    (!second_operand_type.toString().equals(INT_TYPE)&&!second_operand_type.toString().equals(UNDEFINED_TYPE)) )
                 throw new InvalidOperationOperands(lessThanExpr.line, lessThanExpr.col, lessThanExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new BoolType();
 
@@ -423,11 +457,13 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = andExpr.getLhs().accept(this);
         Type second_operand_type = andExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals("(BoolType)") || !second_operand_type.toString().equals("(BoolType)"))
+            if ( (!first_operand_type.toString().equals("(BoolType)")&&!first_operand_type.toString().equals(UNDEFINED_TYPE) ) ||
+                    (!second_operand_type.toString().equals("(BoolType)")&&!second_operand_type.toString().equals(UNDEFINED_TYPE)) )
                 throw new InvalidOperationOperands(andExpr.line, andExpr.col, andExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new BoolType();
     }
@@ -438,11 +474,13 @@ public class TypeChecking implements Visitor<Type> {
         Type first_operand_type = orExpr.getLhs().accept(this);
         Type second_operand_type = orExpr.getRhs().accept(this);
         try {
-            if (!first_operand_type.toString().equals("(BoolType)") || !second_operand_type.toString().equals("(BoolType)"))
+            if ( (!first_operand_type.toString().equals("(BoolType)")&&!first_operand_type.toString().equals(UNDEFINED_TYPE) ) ||
+                    (!second_operand_type.toString().equals("(BoolType)")&&!second_operand_type.toString().equals(UNDEFINED_TYPE)) )
                 throw new InvalidOperationOperands(orExpr.line, orExpr.col, orExpr.toString());
         }
         catch (TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return new BoolType();
     }
@@ -451,11 +489,12 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(Neg negExpr) {
         Type type = negExpr.getExpr().accept(this);
         try{
-            if (!type.toString().equals(INT_TYPE))
+            if (!type.toString().equals(INT_TYPE) && !type.toString().equals(UNDEFINED_TYPE))
                 throw new InvalidOperationOperands(negExpr.line, negExpr.col, negExpr.toString());
         }
         catch(TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return type;
     }
@@ -464,11 +503,12 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(Not notExpr) {
         Type type = notExpr.getExpr().accept(this);
         try{
-            if (!type.toString().equals("(BoolType)"))
+            if (!type.toString().equals("(BoolType)") && !type.toString().equals(UNDEFINED_TYPE) )
                 throw new InvalidOperationOperands(notExpr.line, notExpr.col, notExpr.toString());
         }
         catch(TypeCheckException exception){
             exception.emit_error_message();
+            return new UndefinedType();
         }
         return type;
     }
@@ -489,7 +529,9 @@ public class TypeChecking implements Visitor<Type> {
                 for (Expression arg_expr: methodCall.getArgs() ) {
                     Type arg_type = arg_expr.accept(this);
 
-                    if(!arg_type.toString().equals(UNDEFINED_TYPE) && !method.getArgumentsTypes().get(i).toString().equals(UNDEFINED_TYPE) && !arg_type.toString().equals(method.getArgumentsTypes().get(i).toString()) ){
+                    if(!arg_type.toString().equals(UNDEFINED_TYPE) &&
+                            !method.getArgumentsTypes().get(i).toString().equals(UNDEFINED_TYPE) &&
+                            !arg_type.toString().equals(method.getArgumentsTypes().get(i).toString()) ){
                         throw new Exception(); // GOES TO InvalidMethodCall if args doesnt match
                     }
                     i++;
@@ -536,6 +578,9 @@ public class TypeChecking implements Visitor<Type> {
         try {
             LocalVariableSymbolTableItem var_item = (LocalVariableSymbolTableItem) SymbolTable.top().get("var_" + identifier.getName());
             if (var_item.getIndex() <= var_index) {
+                if(var_item.getInital_value() == null){
+
+                }
                 return var_item.getInital_value();
 //                System.out.println(type);
             }
@@ -562,6 +607,9 @@ public class TypeChecking implements Visitor<Type> {
 
         return new UndefinedType();
     }
+
+
+
 
     @Override
     public Type visit(Self self) {
@@ -761,8 +809,8 @@ public class TypeChecking implements Visitor<Type> {
     @Override
     public Type visit(FieldDeclaration fieldDeclaration) {
 
-        if(!is_type_declared(fieldDeclaration.getType())){
-            System.out.println("Error:Line:" + fieldDeclaration.line + ":" + "There is no type with name " + fieldDeclaration.getType().toString());
+        if(!is_type_declared(fieldDeclaration.getType(), fieldDeclaration.line)){
+
         }
 
         return new VoidType();
@@ -771,10 +819,22 @@ public class TypeChecking implements Visitor<Type> {
     @Override
     public Type visit(ParameterDeclaration parameterDeclaration) {
         var_index++;
-        Type t = parameterDeclaration.getType();
-        if(!is_type_declared(t)){
-            System.out.println("Error:Line:" + parameterDeclaration.line + ":" + "There is no type with name " + t.toString());
+        try {
+//            System.out.println("1");
+            Type t = parameterDeclaration.getType();
+            is_type_declared(t, parameterDeclaration.line);
+            SymbolTable s = SymbolTable.top();
+            LocalVariableSymbolTableItem lvst = (LocalVariableSymbolTableItem) SymbolTable.top().get(VAR_PREFIX + parameterDeclaration.getIdentifier().getName());
+            lvst.setInital_value(parameterDeclaration.getType());
+
+//            System.out.println(lvst.getInital_value());
+
         }
+        catch (Exception exception){
+//            System.out.println("testing");
+        }
+
+
         return new VoidType();
     }
 
@@ -784,16 +844,17 @@ public class TypeChecking implements Visitor<Type> {
         method_return_type = methodDeclaration.getReturnType(); // setting return type of the method declaration
 
         var_index = 0;
-
         String type_name = methodDeclaration.getReturnType().toString();
-        if(!is_type_declared(methodDeclaration.getReturnType())){
-            System.out.println("Error:Line:" + methodDeclaration.line + ":" + "There is no type with name " + type_name);
+        if(!is_type_declared(methodDeclaration.getReturnType() , methodDeclaration.line)){
+
         }
+
+        SymbolTable.pushFromQueue();
 
         for (ParameterDeclaration p: methodDeclaration.getArgs()) {
             p.accept(this);
         }
-        SymbolTable.pushFromQueue();
+
         for (Statement statement: methodDeclaration.getBody()){
 
             statement.accept(this);
@@ -825,8 +886,8 @@ public class TypeChecking implements Visitor<Type> {
 
 
 
-    public  boolean is_type_declared(Type t){
-        String type_name;
+    public  boolean is_type_declared(Type t, int line){
+        String type_name = t.toString();
         String hard_type = t.toString();
         try {
             try{
@@ -843,6 +904,7 @@ public class TypeChecking implements Visitor<Type> {
             return true;
         }
         catch (Exception exception){
+            System.out.println("Error:Line:" + line + ":" + "There is no type with name " + type_name);
             return false;
         }
     }
