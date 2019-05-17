@@ -77,7 +77,9 @@ public class TypeChecking implements Visitor<Type> {
             index = lhs.indexOf(',');
             if(index != -1) {
                 lhs = lhs.substring(index + 1, lhs.length() - 1);
-                index = rhs.indexOf(',');
+            }
+            index = rhs.indexOf(',');
+            if(index != -1) {
                 rhs = rhs.substring(index + 1, rhs.length() - 1);
             }
             Collection<String> a = classHierarchy.getParentsOfNode(rhs);
@@ -858,7 +860,7 @@ public class TypeChecking implements Visitor<Type> {
             Collection<String> a = classHierarchy.getParentsOfNode(class_name);
             if(classHierarchy.getParentsOfNode(class_name).contains(class_name) == true){
                 type_check = false;
-                System.out.println("Error: There is cycle in inheritance");
+                System.out.println("Error:Line:"+ classDeclaration.getName().line +":There is cycle in inheritance");
             }
         }catch (Exception e){
 
@@ -873,6 +875,17 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(EntryClassDeclaration entryClassDeclaration) {
+        String class_name = entryClassDeclaration.getName().getName();
+        try{
+
+            Collection<String> a = classHierarchy.getParentsOfNode(class_name);
+            if(classHierarchy.getParentsOfNode(class_name).contains(class_name) == true){
+                type_check = false;
+                System.out.println("Error:Line:"+ entryClassDeclaration.getName().line +":There is cycle in inheritance");
+            }
+        }catch (Exception e){
+
+        }
         current_class = entryClassDeclaration;
         SymbolTable.pushFromQueue();
 
@@ -929,7 +942,7 @@ public class TypeChecking implements Visitor<Type> {
 
         var_index = 0;
         String type_name = methodDeclaration.getReturnType().toString();
-        if(!is_type_declared(methodDeclaration.getReturnType() , methodDeclaration.line)){
+        if(!is_type_declared(methodDeclaration.getReturnType() , methodDeclaration.getName().line)){
 
         }
 
@@ -983,6 +996,7 @@ public class TypeChecking implements Visitor<Type> {
                 return true;
             int index_of_name = hard_type.indexOf(',');
             type_name = hard_type.substring(index_of_name + 1, hard_type.length() - 1);
+            SymbolTable s = SymbolTable.top();
             SymbolTable.top().get("class_" + type_name);
             return true;
         }
@@ -991,6 +1005,15 @@ public class TypeChecking implements Visitor<Type> {
             type_check = false;
             return false;
         }
+    }
+
+    private String standard_name(String n){
+        int index;
+        index = n.indexOf(',');
+        if(index != -1) {
+            n = n.substring(index + 1, n.length() - 1);
+        }
+        return n;
     }
 
 }

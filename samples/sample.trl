@@ -8,7 +8,9 @@ class t2 inherits t3:
     public field X int;
 end
 
-class t3:
+class t3 inherits t4:
     public field Y int;
 end
 
+class t4:
+end
