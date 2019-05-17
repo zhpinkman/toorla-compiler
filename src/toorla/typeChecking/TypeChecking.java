@@ -82,7 +82,6 @@ public class TypeChecking implements Visitor<Type> {
             if(index != -1) {
                 rhs = rhs.substring(index + 1, rhs.length() - 1);
             }
-            Collection<String> a = classHierarchy.getParentsOfNode(rhs);
             if (lhs.equals(rhs) || classHierarchy.getParentsOfNode(rhs).contains(lhs) ){
 //                System.out.println(true);
                 return true;
@@ -996,7 +995,6 @@ public class TypeChecking implements Visitor<Type> {
                 return true;
             int index_of_name = hard_type.indexOf(',');
             type_name = hard_type.substring(index_of_name + 1, hard_type.length() - 1);
-            SymbolTable s = SymbolTable.top();
             SymbolTable.top().get("class_" + type_name);
             return true;
         }
