@@ -1,17 +1,31 @@
-entry class Sample2 :
-    function main() returns int :
-        var a = 2;
-        begin
-            var a = _a && true;
-            a = b || c && true;
-            var _a = false;
-            var b = _a && true;
-            var c = 1;
-            var d = 1;
-            ( c + d )++;
-            ( c + d )--;
+entry class t1:
+public function main() returns int:
+        var x = new t1();
+        var y = new t2();
+        var z = new t3();
+        return z.xxx(1, true, z.tt.bb);
         end
-        return 0;
-    end
 
+
+end
+
+class t2:
+
+
+    public field temp int;
+    private field zz bool;
+    private field yy string;
+    public field bb t3;
+
+end
+
+
+class t3 inherits t2:
+    public field tt t2;
+
+    public function xxx(x : int, y : bool, z : t2) returns bool:
+       temp = 2;
+       zz = true;
+       yy = "mohsen";
+    end
 end

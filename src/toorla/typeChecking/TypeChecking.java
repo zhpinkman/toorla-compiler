@@ -223,7 +223,7 @@ public class TypeChecking implements Visitor<Type> {
 //            System.out.println(returnStat.getReturnedExpr().accept(this).toString());
 //            System.out.println(method_return_type);
             Type return_type = returnStat.getReturnedExpr().accept(this);
-            if (!return_type.toString().equals(method_return_type.toString()) && !return_type.toString().equals(UNDEFINED_TYPE) )
+            if (!is_subtype(method_return_type.toString(), return_type.toString()) && !return_type.toString().equals(UNDEFINED_TYPE) )
                 throw new InvalidReturnType(returnStat.line, returnStat.col, method_return_type.toStringForError());
         }
         catch (TypeCheckException exception){
@@ -533,7 +533,7 @@ public class TypeChecking implements Visitor<Type> {
 
                     if(!arg_type.toString().equals(UNDEFINED_TYPE) &&
                             !method.getArgumentsTypes().get(i).toString().equals(UNDEFINED_TYPE) &&
-                            !arg_type.toString().equals(method.getArgumentsTypes().get(i).toString()) ){
+                            !is_subtype(method.getArgumentsTypes().get(i).toString(), arg_type.toString() ) ){
                         throw new Exception(); // GOES TO InvalidMethodCall if args doesnt match
                     }
                     i++;
@@ -813,6 +813,13 @@ public class TypeChecking implements Visitor<Type> {
     public Type visit(EntryClassDeclaration entryClassDeclaration) {
         current_class = entryClassDeclaration;
         SymbolTable.pushFromQueue();
+
+        try{
+            MethodSymbolTableItem m = (MethodSymbolTableItem) SymbolTable.top().get("method_main");
+        }catch (Exception e){
+            System.out.println("Error: Entry class and it's ancestors has no main method");
+        }
+
         for (ClassMemberDeclaration classMemberDeclaration: entryClassDeclaration.getClassMembers()){
             classMemberDeclaration.accept(this);
         }

@@ -8,8 +8,3 @@ Error:Line:35:Unsupported operand types for Not;
 Error:Line:37:Illegal access to Field data of an object of class BinarySearch;
 Error:Line:41:There is no Method with name _doSearch with such parameters in class BinarySearch;
 Error:Line:42:Unsupported operand types for MethodCall;
-
-
-
-
-Error:Line:37:Illegal access to Field data of an object of class BinarySearch; *
