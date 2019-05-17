@@ -35,6 +35,7 @@ import toorla.utilities.graph.Graph;
 import javax.sound.midi.Soundbank;
 import javax.sound.midi.SysexMessage;
 import java.sql.SQLOutput;
+import java.util.List;
 
 public class TypeChecking implements Visitor<Type> {
     private Program program;
@@ -470,12 +471,50 @@ public class TypeChecking implements Visitor<Type> {
 
     @Override
     public Type visit(MethodCall methodCall) {
-        String class_name = ((UserDefinedType) methodCall.getInstance().accept(this)).getClassDeclaration().getName().getName();
+        Type instance_type = methodCall.getInstance().accept(this);
+        try {
+            String class_name = ((UserDefinedType) instance_type).getClassDeclaration().getName().getName();
+            ClassSymbolTableItem class_symbol_table = (ClassSymbolTableItem) SymbolTable.top().get(CLASS_PREFIX + class_name);
+            try {
+                MethodSymbolTableItem method = (MethodSymbolTableItem) class_symbol_table.getSymbolTable().get(VAR_PREFIX + methodCall.getMethodName().getName());
+                if ( method.getAccessModifier().toString().equals(public_access) || is_subtype(class_name, current_class.getName().getName()) ){
+                    int i=0;
+                    for (Expression arg_expr: methodCall.getArgs() ) {
+                        Type arg_type = arg_expr.accept(this);
+                        if(!arg_type.toString().equals(UNDEFINED_TYPE) && !arg_type.toString().equals(method.getArgumentsTypes().get(i).toString()) ){
+                            throw new Exception(); // GOES TO InvalidMethodCall if args doesnt match
+                        }
+                        i++;
+                    }
+                    return method.getReturnType();  // PUBLIC or (Private and subClass)
+                }else{
+                    try{
+                        throw new IllegalAccessToMember(methodCall.line, methodCall.col, class_name, "METHOD", method.getName());
+                    }catch (IllegalAccessToMember ie){
+                        ie.emit_error_message();
+                    }
+                }
+//                System.out.println("tested");
+            }catch (Exception  exception){
+                try{
+                    throw new InvalidMethodCall(methodCall.line, methodCall.col, class_name, methodCall.getMethodName().getName());
+                }catch (InvalidMethodCall ie){
+                    ie.emit_error_message();
+                }
+            }
+        }
+        catch (Exception e){
+            //Error for when method call instance was not a class.
+            try {
+                if(!instance_type.toString().equals(UNDEFINED_TYPE) ) { // if not undefined
+                    throw new InvalidOperationOperands(methodCall.line, methodCall.col, methodCall.toString());
+                }
+            }catch (InvalidOperationOperands io){
+                io.emit_error_message();
+            }
+        }
 
-        // as same as field call TODO
-//        System.out.println(class_name);
-
-        return null;
+        return new UndefinedType();
     }
 
 
