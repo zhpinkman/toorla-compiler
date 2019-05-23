@@ -1,4 +1,4 @@
-package toorla.symbolTable;
+package toorla.utilities.stack;
 
 import java.util.ArrayList;
 

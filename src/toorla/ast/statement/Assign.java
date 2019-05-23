@@ -1,7 +1,7 @@
 package toorla.ast.statement;
 
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class Assign extends Statement {
 	private Expression lvalue;
@@ -21,7 +21,7 @@ public class Assign extends Statement {
 		return lvalue;
 	}
 
-	public <R> R accept(Visitor<R> visitor) {
+	public <R> R accept(IVisitor<R> visitor) {
 		return visitor.visit(this);
 	}
 

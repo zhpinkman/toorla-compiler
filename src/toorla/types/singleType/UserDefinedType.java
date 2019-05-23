@@ -1,6 +1,8 @@
 package toorla.types.singleType;
 
 import toorla.ast.declaration.classDecs.ClassDeclaration;
+import toorla.types.Type;
+import toorla.types.Undefined;
 
 public class UserDefinedType extends SingleType {
     private ClassDeclaration typeClass;
@@ -19,6 +21,13 @@ public class UserDefinedType extends SingleType {
 
     @Override
     public String toString() {
-        return "(UserDefined," + typeClass.getName().getName() + ")";
+        return typeClass.getName().getName();
+    }
+
+    @Override
+    public boolean equals(Type type)
+    {
+        return ( type instanceof UserDefinedType && type.toString().equals(toString()) )
+                || type instanceof Undefined;
     }
 }

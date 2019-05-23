@@ -1,6 +1,6 @@
 package toorla.ast.expression;
 
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 import java.util.ArrayList;
 
@@ -19,11 +19,9 @@ public class MethodCall extends Expression {
         return instance;
     }
 
-
     public Identifier getMethodName() {
         return methodName;
     }
-
 
     public ArrayList<Expression> getArgs() {
         return args;
@@ -38,7 +36,7 @@ public class MethodCall extends Expression {
         return "MethodCall";
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 }

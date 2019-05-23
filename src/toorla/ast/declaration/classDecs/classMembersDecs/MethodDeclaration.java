@@ -5,7 +5,7 @@ import toorla.ast.declaration.localVarDecs.ParameterDeclaration;
 import toorla.ast.expression.Identifier;
 import toorla.ast.statement.Statement;
 import toorla.types.Type;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 import java.util.ArrayList;
 
@@ -41,7 +41,6 @@ public class MethodDeclaration extends Declaration implements ClassMemberDeclara
         return name;
     }
 
-
     public ArrayList<ParameterDeclaration> getArgs() {
         return args;
     }
@@ -64,7 +63,7 @@ public class MethodDeclaration extends Declaration implements ClassMemberDeclara
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 }

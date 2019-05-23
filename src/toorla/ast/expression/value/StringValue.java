@@ -2,7 +2,7 @@ package toorla.ast.expression.value;
 
 import toorla.types.Type;
 import toorla.types.singleType.StringType;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class StringValue extends Value {
     private String constant;
@@ -30,8 +30,8 @@ public class StringValue extends Value {
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
-        return visitor.visit( this );
+    public <R> R accept(IVisitor<R> visitor) {
+        return visitor.visit(this);
     }
 
 }

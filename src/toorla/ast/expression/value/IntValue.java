@@ -1,9 +1,8 @@
 package toorla.ast.expression.value;
 
-
 import toorla.types.Type;
 import toorla.types.singleType.IntType;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class IntValue extends Value {
     private int constant;
@@ -31,8 +30,8 @@ public class IntValue extends Value {
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
-        return visitor.visit( this );
+    public <R> R accept(IVisitor<R> visitor) {
+        return visitor.visit(this);
     }
 
 }

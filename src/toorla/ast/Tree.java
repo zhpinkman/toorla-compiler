@@ -1,7 +1,7 @@
 package toorla.ast;
 
-import toorla.nameAnalyzer.compileErrorException.CompileErrorException;
-import toorla.visitor.Visitor;
+import toorla.compileErrorException.CompileErrorException;
+import toorla.visitor.IVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +9,23 @@ import java.util.List;
 public abstract class Tree {
 	public int line;
 	public int col;
-	public List<CompileErrorException> relatedErrors = new ArrayList<>();
+	private List<CompileErrorException> relatedErrors = new ArrayList<>();
 
-	public abstract <R> R accept(Visitor<R> visitor);
+	public List<CompileErrorException> flushErrors() {
+		List<CompileErrorException> ret = relatedErrors;
+		relatedErrors = new ArrayList<>();
+		return ret;
+	}
+
+	public void addError(CompileErrorException e) {
+		relatedErrors.add(e);
+	}
+
+	public boolean hasError() {
+		return relatedErrors.size() != 0;
+	}
+
+	public abstract <R> R accept(IVisitor<R> visitor);
 
 	public abstract String toString();
 }

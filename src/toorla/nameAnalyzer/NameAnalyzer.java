@@ -19,29 +19,26 @@ public class NameAnalyzer {
         NameCollectionPass nameCollectionPass = new NameCollectionPass();
         ClassParentshipExtractorPass classParentshipExtractorPass = new ClassParentshipExtractorPass();
         NameCheckingPass nameCheckingPass = new NameCheckingPass();
-        ReportingPass reportingPass = new ReportingPass();
         prepare();
-        nameCollectionPass.analyze( program );
-        classParentshipExtractorPass.analyze( program );
-        nameCheckingPass.analyze( program );
+        nameCollectionPass.analyze(program);
+        classParentshipExtractorPass.analyze(program);
+        nameCheckingPass.analyze(program);
         classHierarchy = classParentshipExtractorPass.getResult();
-        reportingPass.analyze( program );
-        program.accept( new NameTreePrinter() );
+
     }
 
     private void prepare() {
         SymbolTable.root = new SymbolTable();
         ClassSymbolTableItem classAnySymbolTableItem = new ClassSymbolTableItem("Any");
-        classAnySymbolTableItem.setSymbolTable( new SymbolTable( SymbolTable.root ) );
+        classAnySymbolTableItem.setSymbolTable(new SymbolTable(SymbolTable.root));
         try {
             SymbolTable.root.put(classAnySymbolTableItem);
+        } catch (ItemAlreadyExistsException ignored) {
         }
-        catch (ItemAlreadyExistsException ignored) {
-        }
-        SymbolTable.push( classAnySymbolTableItem.getSymbolTable() );
+        SymbolTable.push(classAnySymbolTableItem.getSymbolTable());
     }
 
-    public Graph getClassHierarchy() {
+    public Graph<String> getClassHierarchy() {
         return classHierarchy;
     }
 }

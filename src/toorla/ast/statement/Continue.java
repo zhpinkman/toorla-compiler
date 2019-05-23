@@ -1,10 +1,10 @@
 package toorla.ast.statement;
 
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class Continue extends Statement {
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 

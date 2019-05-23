@@ -1,7 +1,7 @@
 package toorla.ast.statement;
 
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class While extends Statement {
 	public Expression expr;
@@ -12,7 +12,7 @@ public class While extends Statement {
 		this.body = body;
 	}
 
-	public <R> R accept(Visitor<R> visitor) {
+	public <R> R accept(IVisitor<R> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -1,6 +1,6 @@
 package toorla.ast.statement;
 
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class Block extends Statement {
 		this.body = body;
 	}
 
-	public <R> R accept(Visitor<R> visitor) {
+	public <R> R accept(IVisitor<R> visitor) {
 		return visitor.visit(this);
 	}
 

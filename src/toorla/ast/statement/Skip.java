@@ -1,11 +1,11 @@
 package toorla.ast.statement;
 
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class Skip extends Statement {
     @Override
-    public <R> R accept(Visitor<R> visitor) {
-        return visitor.visit( this );
+    public <R> R accept(IVisitor<R> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package toorla.ast.declaration.classDecs;
 
 import toorla.ast.expression.Identifier;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class EntryClassDeclaration extends ClassDeclaration {
     public EntryClassDeclaration(Identifier name) {
@@ -13,14 +13,12 @@ public class EntryClassDeclaration extends ClassDeclaration {
     }
 
     @Override
-    public <R> R accept( Visitor<R> visitor )
-    {
-        return visitor.visit( this );
+    public <R> R accept(IVisitor<R> visitor) {
+        return visitor.visit(this);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "EntryClassDeclaration";
     }
 }

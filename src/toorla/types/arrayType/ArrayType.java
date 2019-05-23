@@ -20,6 +20,14 @@ public class ArrayType extends Type {
 
     @Override
     public String toString() {
-        return "(ArrayType," + singleType.toString() + ")";
+        return "array of " + singleType.toString();
+    }
+
+    @Override
+    public boolean equals(Type type) {
+        if( type instanceof ArrayType)
+            return ((ArrayType) type).getSingleType().equals(singleType);
+        else
+            return false;
     }
 }

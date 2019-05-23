@@ -3,6 +3,7 @@ package toorla.symbolTable;
 import toorla.symbolTable.exceptions.ItemAlreadyExistsException;
 import toorla.symbolTable.exceptions.ItemNotFoundException;
 import toorla.symbolTable.symbolTableItem.SymbolTableItem;
+import toorla.utilities.stack.Stack;
 
 import java.util.*;
 
@@ -14,6 +15,7 @@ public class SymbolTable {
 
     private static SymbolTable top;
     public static SymbolTable root;
+    private static int mustBeUsedAfterDefCount = 0;
 
     private static Stack<SymbolTable> stack = new Stack<>();
     private static Queue<SymbolTable> queue = new LinkedList<>();
@@ -26,6 +28,20 @@ public class SymbolTable {
         push(queue.remove());
     }
 
+    public static void define()
+    {
+        mustBeUsedAfterDefCount++;
+    }
+
+    public static int getCountOfDefinedMustBeUsedAfterDefItems()
+    {
+        return mustBeUsedAfterDefCount;
+    }
+
+    public static void reset()
+    {
+        mustBeUsedAfterDefCount = 0;
+    }
     public static void push(SymbolTable symbolTable) {
         if (top != null)
             stack.push(top);
@@ -56,8 +72,7 @@ public class SymbolTable {
 
     public SymbolTableItem get(String key) throws ItemNotFoundException {
         Set<SymbolTable> visitedSymbolTables = new HashSet<>();
-        SymbolTable currentSymbolTable = this;
-        return getSymbolTableItemInCurrentOrParents(key, visitedSymbolTables, currentSymbolTable);
+        return getSymbolTableItemInCurrentOrParents(key, visitedSymbolTables,this);
     }
 
     public SymbolTableItem getInParentScopes(String key) throws ItemNotFoundException {
@@ -67,6 +82,8 @@ public class SymbolTable {
         {
             Set<SymbolTable> visitedSymbolTables = new HashSet<>();
             visitedSymbolTables.add(this);
+            if( this.pre == this )
+                throw new ItemNotFoundException();
             SymbolTable currentSymbolTable = this.pre;
             return getSymbolTableItemInCurrentOrParents(key, visitedSymbolTables, currentSymbolTable);
         }
@@ -76,10 +93,10 @@ public class SymbolTable {
         do {
             visitedSymbolTables.add( currentSymbolTable );
             SymbolTableItem value = currentSymbolTable.items.get(key);
-            if (value == null )
-                currentSymbolTable = currentSymbolTable.getPreSymbolTable();
-            else
-                return value;
+            if( value != null )
+                if( value.getDefinitionNumber() <= SymbolTable.mustBeUsedAfterDefCount)
+                    return value;
+            currentSymbolTable = currentSymbolTable.getPreSymbolTable();
         } while( currentSymbolTable != null &&
                 !visitedSymbolTables.contains( currentSymbolTable ) );
         throw new ItemNotFoundException();

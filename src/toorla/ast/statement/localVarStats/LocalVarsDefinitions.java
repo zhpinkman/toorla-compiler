@@ -1,7 +1,7 @@
 package toorla.ast.statement.localVarStats;
 
 import toorla.ast.statement.Statement;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class LocalVarsDefinitions extends Statement {
         return definitions;
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 

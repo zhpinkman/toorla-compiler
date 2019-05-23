@@ -7,17 +7,16 @@ public class FieldSymbolTableItem extends VarSymbolTableItem {
 
     private AccessModifier accessModifier;
 
-    public FieldSymbolTableItem(String name , AccessModifier accessModifier , Type type ){
-        this.name=name;
+    public FieldSymbolTableItem(String name, AccessModifier accessModifier, Type type) {
+        this.name = name;
         this.accessModifier = accessModifier;
-        this.varType = type;
+        this.type = type;
     }
 
-    public FieldSymbolTableItem( String name , Type type )
-    {
+    public FieldSymbolTableItem(String name, Type type) {
         this.name = name;
         this.accessModifier = AccessModifier.ACCESS_MODIFIER_PRIVATE;
-        this.varType = type;
+        this.type = type;
     }
 
     public AccessModifier getAccessModifier() {
@@ -28,5 +27,11 @@ public class FieldSymbolTableItem extends VarSymbolTableItem {
         this.accessModifier = accessModifier;
     }
 
+    public Type getFieldType() {
+        return type;
+    }
 
+    public void setFieldType(Type fieldType) {
+        this.type = fieldType;
+    }
 }

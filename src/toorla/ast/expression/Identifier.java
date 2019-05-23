@@ -1,6 +1,6 @@
 package toorla.ast.expression;
 
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class Identifier extends Expression {
     private String name;
@@ -13,7 +13,7 @@ public class Identifier extends Expression {
         return name;
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 
@@ -23,5 +23,11 @@ public class Identifier extends Expression {
             return "(Identifier," + name + ")";
         else
             return "(Identifier,Dummy)";
+    }
+
+    @Override
+    public boolean isLvalue()
+    {
+        return true;
     }
 }

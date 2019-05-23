@@ -1,7 +1,7 @@
 package toorla.ast.expression.binaryExpression;
 
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class Minus extends BinaryExpression {
 
@@ -10,11 +10,11 @@ public class Minus extends BinaryExpression {
 	}
 
 	public Minus() {
-		super( null , null );
+		super(null, null);
 	}
 
 	@Override
-	public <R> R accept(Visitor<R> visitor) {
+	public <R> R accept(IVisitor<R> visitor) {
 		return visitor.visit(this);
 	}
 

@@ -1,9 +1,10 @@
 package toorla.ast.declaration.classDecs.classMembersDecs;
 
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public interface ClassMemberDeclaration {
-    <R> R accept(Visitor<R> visitor);
+    <R> R accept(IVisitor<R> visitor);
+
     String toString();
-    
+
 }

@@ -11,7 +11,8 @@ public class MethodSymbolTableItem extends SymbolTableItem {
     private List<Type> argumentsTypes;
     private AccessModifier accessModifier;
 
-    public MethodSymbolTableItem(String name, Type returnType, List<Type> argumentsTypes , AccessModifier accessModifier) {
+    public MethodSymbolTableItem(String name, Type returnType, List<Type> argumentsTypes,
+                                 AccessModifier accessModifier) {
         this.returnType = returnType;
         this.argumentsTypes = argumentsTypes;
         this.name = name;
@@ -23,7 +24,6 @@ public class MethodSymbolTableItem extends SymbolTableItem {
         return MethodSymbolTableItem.methodModifier + name;
     }
 
-
     public List<Type> getArgumentsTypes() {
         return argumentsTypes;
     }
@@ -34,5 +34,9 @@ public class MethodSymbolTableItem extends SymbolTableItem {
 
     public AccessModifier getAccessModifier() {
         return accessModifier;
+    }
+
+    public void setAccessModifier(AccessModifier accessModifier) {
+        this.accessModifier = accessModifier;
     }
 }

@@ -1,14 +1,13 @@
 package toorla.ast.expression.value;
 
-
 import toorla.types.Type;
 import toorla.types.singleType.BoolType;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class BoolValue extends Value {
     private boolean constant;
 
-    public BoolValue( boolean constant ) {
+    public BoolValue(boolean constant) {
         this.constant = constant;
 
     }
@@ -32,7 +31,7 @@ public class BoolValue extends Value {
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 }

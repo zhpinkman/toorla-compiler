@@ -1,7 +1,7 @@
 package toorla.ast.statement;
 
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class IncStatement extends Statement {
     private Expression operand;
@@ -11,8 +11,8 @@ public class IncStatement extends Statement {
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
-        return visitor.visit( this );
+    public <R> R accept(IVisitor<R> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

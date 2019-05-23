@@ -1,7 +1,7 @@
 package toorla.ast.expression;
 
 import toorla.types.singleType.SingleType;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class NewArray extends Expression {
     private Expression length;
@@ -29,7 +29,7 @@ public class NewArray extends Expression {
         return "NewArray";
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 }

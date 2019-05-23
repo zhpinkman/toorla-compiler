@@ -1,7 +1,7 @@
 package toorla.ast.expression.unaryExpression;
 
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class Not extends UnaryExpression {
 
@@ -10,10 +10,10 @@ public class Not extends UnaryExpression {
 	}
 
 	public Not() {
-		super( null );
+		super(null);
 	}
 
-	public <R> R accept(Visitor<R> visitor) {
+	public <R> R accept(IVisitor<R> visitor) {
 		return visitor.visit(this);
 	}
 

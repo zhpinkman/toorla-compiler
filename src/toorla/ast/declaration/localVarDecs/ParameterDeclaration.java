@@ -3,7 +3,7 @@ package toorla.ast.declaration.localVarDecs;
 import toorla.ast.declaration.TypedVariableDeclaration;
 import toorla.ast.expression.Identifier;
 import toorla.types.Type;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class ParameterDeclaration extends TypedVariableDeclaration {
     public ParameterDeclaration(Identifier name, Type type) {
@@ -12,7 +12,7 @@ public class ParameterDeclaration extends TypedVariableDeclaration {
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 

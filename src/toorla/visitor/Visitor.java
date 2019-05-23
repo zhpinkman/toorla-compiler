@@ -18,57 +18,176 @@ import toorla.ast.statement.localVarStats.LocalVarDef;
 import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 
+public class Visitor<R> implements IVisitor<R> {
+    // Expression
+    public R visit(Plus plusExpr) {
+        return null;
+    }
 
-public interface Visitor<R> {
-	// Statement
-	R visit(PrintLine printStat);
-	R visit(Assign assignStat);
-	R visit(Block block);
-	R visit(Conditional conditional);
-	R visit(While whileStat);
-	R visit(Return returnStat);
-	R visit(Break breakStat);
-	R visit(Continue continueStat);
-	R visit(Skip skip);
-	R visit(LocalVarDef localVarDef);
-	R visit(IncStatement incStatement);
-	R visit(DecStatement decStatement);
+    public R visit(Minus minusExpr) {
+        return null;
+    }
 
+    public R visit(Times timesExpr) {
+        return null;
+    }
 
+    public R visit(Division divExpr) {
+        return null;
+    }
 
-	// Expression
-	R visit(Plus plusExpr);
-	R visit(Minus minusExpr);
-	R visit(Times timesExpr);
-	R visit(Division divExpr);
-	R visit(Modulo moduloExpr);
-	R visit(Equals equalsExpr);
-	R visit(GreaterThan gtExpr);
-	R visit(LessThan lessThanExpr);
-	R visit(And andExpr);
-	R visit(Or orExpr);
-	R visit(Neg negExpr);
-	R visit(Not notExpr);
-	R visit(MethodCall methodCall);
-	R visit(Identifier identifier);
-	R visit(Self self);
-    R visit(IntValue intValue);
-	R visit(NewArray newArray);
-	R visit(BoolValue booleanValue);
-	R visit(StringValue stringValue);
-	R visit(NewClassInstance newClassInstance);
-	R visit(FieldCall fieldCall);
-	R visit(ArrayCall arrayCall);
-	R visit(NotEquals notEquals);
+    public R visit(Modulo moduloExpr) {
+        return null;
+    }
 
-	//declarations
-	R visit(ClassDeclaration classDeclaration);
-	R visit(EntryClassDeclaration entryClassDeclaration);
-	R visit(FieldDeclaration fieldDeclaration);
-	R visit(ParameterDeclaration parameterDeclaration);
-	R visit(MethodDeclaration methodDeclaration);
-    R visit(LocalVarsDefinitions localVarsDefinitions);
+    public R visit(Equals equalsExpr) {
+        return null;
+    }
 
-	R visit(Program program);
+    public R visit(GreaterThan gtExpr) {
+        return null;
+    }
+
+    public R visit(LessThan lessThanExpr) {
+        return null;
+    }
+
+    public R visit(And andExpr) {
+        return null;
+    }
+
+    public R visit(Or orExpr) {
+        return null;
+    }
+
+    public R visit(Neg negExpr) {
+        return null;
+    }
+
+    public R visit(Not notExpr) {
+        return null;
+    }
+
+    public R visit(MethodCall methodCall) {
+        return null;
+    }
+
+    public R visit(Identifier identifier) {
+        return null;
+    }
+
+    public R visit(Self self) {
+        return null;
+    }
+
+    public R visit(IntValue intValue) {
+        return null;
+    }
+
+    public R visit(NewArray newArray) {
+        return null;
+    }
+
+    public R visit(BoolValue booleanValue) {
+        return null;
+    }
+
+    public R visit(StringValue stringValue) {
+        return null;
+    }
+
+    public R visit(NewClassInstance newClassInstance) {
+        return null;
+    }
+
+    public R visit(FieldCall fieldCall) {
+        return null;
+    }
+
+    public R visit(ArrayCall arrayCall) {
+        return null;
+    }
+
+    public R visit(NotEquals notEquals) {
+        return null;
+    }
+
+    // Statement
+    public R visit(PrintLine printStat) {
+        return null;
+    }
+
+    public R visit(Assign assignStat) {
+        return null;
+    }
+
+    public R visit(Block block) {
+        return null;
+    }
+
+    public R visit(Conditional conditional) {
+        return null;
+    }
+
+    public R visit(While whileStat) {
+        return null;
+    }
+
+    public R visit(Return returnStat) {
+        return null;
+    }
+
+    public R visit(Break breakStat) {
+        return null;
+    }
+
+    public R visit(Continue continueStat) {
+        return null;
+    }
+
+    public R visit(Skip skip) {
+        return null;
+    }
+
+    public R visit(LocalVarDef localVarDef) {
+        return null;
+    }
+
+    public R visit(IncStatement incStatement) {
+        return null;
+    }
+
+    public R visit(DecStatement decStatement) {
+        return null;
+    }
+
+    // declarations
+    public R visit(ClassDeclaration classDeclaration) {
+        return null;
+    }
+
+    public R visit(EntryClassDeclaration entryClassDeclaration) {
+        return null;
+    }
+
+    public R visit(FieldDeclaration fieldDeclaration) {
+        return null;
+    }
+
+    public R visit(ParameterDeclaration parameterDeclaration) {
+        return null;
+    }
+
+    public R visit(MethodDeclaration methodDeclaration) {
+        return null;
+    }
+
+    public R visit(LocalVarsDefinitions localVarsDefinitions) {
+        return null;
+    }
+
+    public R visit(Program program) {
+        return null;
+    }
 
 }

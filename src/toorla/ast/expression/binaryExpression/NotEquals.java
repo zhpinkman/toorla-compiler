@@ -1,7 +1,7 @@
 package toorla.ast.expression.binaryExpression;
 
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class NotEquals extends BinaryExpression {
 
@@ -9,13 +9,12 @@ public class NotEquals extends BinaryExpression {
         super(lhs, rhs);
     }
 
-    public NotEquals()
-    {
-        super( null , null );
+    public NotEquals() {
+        super(null, null);
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 

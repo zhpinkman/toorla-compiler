@@ -3,7 +3,7 @@ package toorla.ast.declaration.classDecs.classMembersDecs;
 import toorla.ast.declaration.TypedVariableDeclaration;
 import toorla.ast.expression.Identifier;
 import toorla.types.Type;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class FieldDeclaration extends TypedVariableDeclaration implements ClassMemberDeclaration {
 
@@ -43,7 +43,7 @@ public class FieldDeclaration extends TypedVariableDeclaration implements ClassM
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 }

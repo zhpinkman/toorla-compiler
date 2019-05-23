@@ -1,8 +1,7 @@
 package toorla.ast.expression.binaryExpression;
 
-
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class And extends BinaryExpression {
 	public And(Expression lhs, Expression rhs) {
@@ -10,7 +9,7 @@ public class And extends BinaryExpression {
 	}
 
 	@Override
-	public <R> R accept(Visitor<R> visitor) {
+	public <R> R accept(IVisitor<R> visitor) {
 		return visitor.visit(this);
 	}
 

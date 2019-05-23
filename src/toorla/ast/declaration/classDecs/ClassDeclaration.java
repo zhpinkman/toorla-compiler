@@ -5,7 +5,7 @@ import toorla.ast.declaration.classDecs.classMembersDecs.ClassMemberDeclaration;
 import toorla.ast.declaration.classDecs.classMembersDecs.FieldDeclaration;
 import toorla.ast.declaration.classDecs.classMembersDecs.MethodDeclaration;
 import toorla.ast.expression.Identifier;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +39,9 @@ public class ClassDeclaration extends Declaration {
         return parentName;
     }
 
-
     public ArrayList<ClassMemberDeclaration> getClassMembers() {
         return members;
     }
-
 
     public void addFieldsDeclarations(List<FieldDeclaration> varDeclarations) {
         this.members.addAll(varDeclarations);
@@ -59,7 +57,7 @@ public class ClassDeclaration extends Declaration {
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(IVisitor<R> visitor) {
         return visitor.visit(this);
     }
 }

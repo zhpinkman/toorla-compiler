@@ -1,7 +1,7 @@
 package toorla.ast.expression.binaryExpression;
 
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public abstract class BinaryExpression extends Expression {
     protected Expression lhs;
@@ -36,6 +36,6 @@ public abstract class BinaryExpression extends Expression {
         this.rhs = rhs;
     }
 
-    public abstract <R> R accept(Visitor<R> visitor);
+    public abstract <R> R accept(IVisitor<R> visitor);
 
 }

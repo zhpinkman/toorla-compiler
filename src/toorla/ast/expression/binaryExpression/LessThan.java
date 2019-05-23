@@ -1,7 +1,7 @@
 package toorla.ast.expression.binaryExpression;
 
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public class LessThan extends BinaryExpression {
 
@@ -10,11 +10,11 @@ public class LessThan extends BinaryExpression {
 	}
 
 	public LessThan() {
-		super( null , null );
+		super(null, null);
 	}
 
 	@Override
-	public <R> R accept(Visitor<R> visitor) {
+	public <R> R accept(IVisitor<R> visitor) {
 		return visitor.visit(this);
 	}
 

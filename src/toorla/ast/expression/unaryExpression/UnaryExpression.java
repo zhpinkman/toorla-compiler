@@ -1,7 +1,7 @@
 package toorla.ast.expression.unaryExpression;
 
 import toorla.ast.expression.Expression;
-import toorla.visitor.Visitor;
+import toorla.visitor.IVisitor;
 
 public abstract class UnaryExpression extends Expression {
     protected Expression expr;
@@ -13,7 +13,7 @@ public abstract class UnaryExpression extends Expression {
     public UnaryExpression() {
     }
 
-    public abstract <R> R accept(Visitor<R> visitor);
+    public abstract <R> R accept(IVisitor<R> visitor);
 
     public Expression getExpr() {
         return expr;

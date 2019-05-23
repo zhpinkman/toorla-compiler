@@ -15,4 +15,12 @@ public abstract class SymbolTableItem {
     {
         this.name = name;
     }
+    public boolean mustBeUsedAfterDef()
+    {
+        return false;
+    }
+    public int getDefinitionNumber()
+    {
+        return 0;
+    }
 }
