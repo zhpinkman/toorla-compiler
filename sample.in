@@ -1,28 +1,30 @@
 entry class t1 :
-    public field temp bool;
+    private field temp int;
 
     public function main() returns int:
-        //var temp = 2;
-        //var x = new t3();
-        var y = new t2();
-        var a = new t2();
-        //var z = new t1();
-        //a = y;
-        temp = true;
-        var tt = a.doSearch(y);
-        //return 2;
+    var x = new t1();
+    var y = new t2();
+    var z = new t3();
+    return z.xxx(1, true, z.tt.bb);
     end
 end
 
 class t2:
+
     public field temp int;
-    public function doSearch(a : t2) returns int :
-        //var p = 2;
-    end
+    private field zz bool;
+    private field yy string;
+    public field bb t3;
 
 end
 
 
 class t3 inherits t2:
+    public field tt t2;
 
+    public function xxx(x : int, y : bool, z : t2) returns bool:
+       temp = 2;
+       zz = true;
+       yy = "mohsen";
+    end
 end
