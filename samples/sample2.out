@@ -1,0 +1,5 @@
+Error:Line:5:Variable _a is not declared yet in this Scope;
+Error:Line:6:Variable b is not declared yet in this Scope;
+Error:Line:6:Variable c is not declared yet in this Scope;
+Error:Line:11:Operand of Inc must be a valid lvalue
+Error:Line:12:Operand of Dec must be a valid lvalue

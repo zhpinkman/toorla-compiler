@@ -1,0 +1,10 @@
+Error:Line:7:Condition type must be bool in Conditional statement;
+Error:Line:8:Invalid use of Continue, Continue must be used as loop statement;
+Error:Line:9:Invalid use of Break, Break must be used as loop statement;
+Error:Line:21:Illegal access to Method doSearch of an object of class BinarySearch;
+Error:Line:22:There is no Method with name doSearch with such parameters in class BinarySearch;
+Error:Line:24:Expression returned by this method must be int;
+Error:Line:35:Unsupported operand types for Not;
+Error:Line:37:Illegal access to Field data of an object of class BinarySearch;
+Error:Line:41:There is no Method with name _doSearch with such parameters in class BinarySearch;
+Error:Line:42:Unsupported operand types for MethodCall;
