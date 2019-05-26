@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import toorla.ast.Program;
+import toorla.codeGenerator.CodeGenrator;
 import toorla.nameAnalyzer.NameAnalyzer;
 import toorla.typeChecker.TypeChecker;
 import toorla.visitor.ErrorReporter;
@@ -21,5 +22,7 @@ public class ToorlaCompiler {
         if( numOfErrors > 0 )
             System.exit(1);
         System.out.println("No error detected;");
+        CodeGenrator codeGenrator = new CodeGenrator();
+        toorlaASTCode.accept(codeGenrator);
     }
 }

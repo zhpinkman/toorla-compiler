@@ -18,28 +18,42 @@ import toorla.ast.statement.*;
 import toorla.ast.statement.localVarStats.LocalVarDef;
 import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
-import toorla.compileErrorException.CompileErrorException;
-import toorla.compileErrorException.typeErrors.*;
-import toorla.compileErrorException.typeErrors.itemNotDeclared.ClassNotDeclaredException;
-import toorla.symbolTable.SymbolTable;
-import toorla.symbolTable.exceptions.ItemNotFoundException;
-import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
-import toorla.symbolTable.symbolTableItem.MethodSymbolTableItem;
-import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
-import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
-import toorla.typeChecker.ExpressionTypeExtractor;
-import toorla.types.Type;
-import toorla.types.Undefined;
-import toorla.types.arrayType.ArrayType;
-import toorla.types.singleType.BoolType;
-import toorla.types.singleType.IntType;
-import toorla.types.singleType.StringType;
-import toorla.types.singleType.UserDefinedType;
-import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
+import java.io.File;
+import java.io.IOException;
+
 public class CodeGenrator extends Visitor<Void> {
+
+    public void create_class_file(String class_name){
+        File file = new File("artifact/" + class_name + ".j");
+        try{
+            file.createNewFile();
+        }
+        catch (IOException se){
+
+        }
+    }
+
+
+    public void create_directory(){
+        File theDir = new File("artifact");
+        try{
+            theDir.mkdir();
+        }
+        catch(SecurityException se){
+        }
+    }
+
+    public CodeGenrator(){
+        create_directory();
+    }
+
+
     public Void visit(Plus plusExpr) {
+        plusExpr.getRhs().accept(this);
+        plusExpr.getLhs().accept(this);
+        System.out.println("");
         return null;
     }
 
@@ -182,10 +196,12 @@ public class CodeGenrator extends Visitor<Void> {
 
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
+        create_class_file(classDeclaration.getName().getName());
         return null;
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        create_class_file(entryClassDeclaration.getName().getName());
         return null;
     }
 
@@ -206,6 +222,9 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Program program) {
+        for (ClassDeclaration classDeclaration : program.getClasses()){
+            classDeclaration.accept(this);
+        }
         return null;
     }
 

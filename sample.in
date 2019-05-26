@@ -22,7 +22,7 @@ end
 class t3 inherits t2:
     public field tt t2;
 
-    public function xxx(x : int, y : bool, z : t2) returns bool:
+    public function xxx(x : int, y : bool, z : t2) returns int:
        temp = 2;
        zz = true;
        yy = "mohsen";
