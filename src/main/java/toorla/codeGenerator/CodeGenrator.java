@@ -20,18 +20,25 @@ import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 import toorla.visitor.Visitor;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class CodeGenrator extends Visitor<Void> {
+
+
+    public BufferedWriter writer;
 
     public void create_class_file(String class_name){
         File file = new File("artifact/" + class_name + ".j");
         try{
             file.createNewFile();
+            writer = new BufferedWriter(new FileWriter("artifact/" + class_name + ".j", true));
+            writer.write("zhivar");
+            writer.close();
         }
         catch (IOException se){
-
         }
     }
 
@@ -53,7 +60,7 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(Plus plusExpr) {
         plusExpr.getRhs().accept(this);
         plusExpr.getLhs().accept(this);
-        System.out.println("");
+        System.out.println("iadd");
         return null;
     }
 
