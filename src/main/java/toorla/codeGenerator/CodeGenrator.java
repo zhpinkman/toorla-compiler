@@ -29,6 +29,7 @@ public class CodeGenrator extends Visitor<Void> {
 
 
     public BufferedWriter writer;
+    int tabs_before;
 
     public void create_class_file(String class_name){
         File file = new File("artifact/" + class_name + ".j");
@@ -36,7 +37,6 @@ public class CodeGenrator extends Visitor<Void> {
             file.createNewFile();
             writer = new BufferedWriter(new FileWriter("artifact/" + class_name + ".j", true));
             writer.write("zhivar");
-            writer.close();
         }
         catch (IOException se){
         }
@@ -53,14 +53,31 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public CodeGenrator(){
+        tabs_before = 0;
         create_directory();
     }
 
+    public void append_command(String command)
+    {
+        try {
+            for (int i = 0;i < tabs_before; i++)
+                writer.write("      ");
+            writer.write(command);
+            writer.newLine();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
     public Void visit(Plus plusExpr) {
         plusExpr.getRhs().accept(this);
         plusExpr.getLhs().accept(this);
-        System.out.println("iadd");
+
+        append_command();
+
         return null;
     }
 
