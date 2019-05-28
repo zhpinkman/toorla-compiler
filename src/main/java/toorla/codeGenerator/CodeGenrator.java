@@ -20,8 +20,11 @@ import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 import toorla.typeChecker.ExpressionTypeExtractor;
 import toorla.types.Type;
+import toorla.types.arrayType.ArrayType;
+import toorla.types.singleType.BoolType;
 import toorla.types.singleType.IntType;
 import toorla.types.singleType.StringType;
+import toorla.types.singleType.UserDefinedType;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
@@ -29,13 +32,46 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class CodeGenrator extends Visitor<Void> {
 
+    static String INTEGER_TYPE = "I";
+    static String STRING_TYPE = "Ljava/lang/String;";
+    static String BOOL_TYPE = "Z";
+    static String ARRAY_TYPE = "[";
     ExpressionTypeExtractor expressionTypeExtractor;
     public BufferedWriter writer;
     int tabs_before;
 
+    public String get_type_code(Type param){
+        if (param instanceof IntType)
+            return  INTEGER_TYPE;
+        else if (param instanceof StringType)
+            return  STRING_TYPE;
+        else if (param instanceof BoolType)
+            return BOOL_TYPE;
+//            else if (parameter.getType() instanceof UserDefinedType)
+//                result += parameter.getType(). TODO handle package for the format of user define types
+        else if (param instanceof ArrayType){
+            ArrayType type = (toorla.types.arrayType.ArrayType) param;
+            return  ARRAY_TYPE + get_type_code(type.getSingleType());
+        }
+
+    }
+
+    public String get_args_code(ArrayList<ParameterDeclaration> args){
+        String result = "";
+        for (ParameterDeclaration parameter : args){
+            result += get_type_code(parameter.getType());
+        }
+        return result;
+    }
+
+    public void append_limits(){
+        append_command(".limits locals 10");
+        append_command(".limits stack 100");
+    }
 
     public void append_default_constructor(){
         append_command(".method public <init>()V\n" +
@@ -251,11 +287,14 @@ public class CodeGenrator extends Visitor<Void> {
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
         create_class_file(classDeclaration.getName().getName());
+        append_default_constructor();
         return null;
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
         create_class_file(entryClassDeclaration.getName().getName());
+        append_default_constructor();
+
         return null;
     }
 
@@ -268,7 +307,13 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(MethodDeclaration methodDeclaration) {
-        append_default_constructor();
+        String static_keyword = " ";
+        if (methodDeclaration.getName().getName().equals("main"))
+            static_keyword = " static";
+        String arg_defs = get_args_code(methodDeclaration.getArgs());
+        append_command(".method " + methodDeclaration.getAccessModifier().toString() + static_keyword + methodDeclaration.getName().getName() + "(" +
+                arg_defs + ")" + get_type_code(methodDeclaration.getReturnType()));
+        append_limits();
         return null;
     }
 
