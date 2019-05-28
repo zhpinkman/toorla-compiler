@@ -22,7 +22,7 @@ public class ToorlaCompiler {
         if( numOfErrors > 0 )
             System.exit(1);
         System.out.println("No error detected;");
-        CodeGenrator codeGenrator = new CodeGenrator();
+        CodeGenrator codeGenrator = new CodeGenrator(nameAnalyzer.getClassHierarchy());
         toorlaASTCode.accept(codeGenrator);
     }
 }

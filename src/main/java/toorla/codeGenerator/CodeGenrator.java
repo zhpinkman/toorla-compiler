@@ -18,6 +18,11 @@ import toorla.ast.statement.*;
 import toorla.ast.statement.localVarStats.LocalVarDef;
 import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
+import toorla.typeChecker.ExpressionTypeExtractor;
+import toorla.types.Type;
+import toorla.types.singleType.IntType;
+import toorla.types.singleType.StringType;
+import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
 import java.io.BufferedWriter;
@@ -27,7 +32,7 @@ import java.io.IOException;
 
 public class CodeGenrator extends Visitor<Void> {
 
-
+    ExpressionTypeExtractor expressionTypeExtractor;
     public BufferedWriter writer;
     int tabs_before;
 
@@ -52,7 +57,8 @@ public class CodeGenrator extends Visitor<Void> {
         }
     }
 
-    public CodeGenrator(){
+    public CodeGenrator(Graph<String> classHierarchy){
+        expressionTypeExtractor = new ExpressionTypeExtractor(classHierarchy);
         tabs_before = 0;
         create_directory();
     }
@@ -76,7 +82,7 @@ public class CodeGenrator extends Visitor<Void> {
         plusExpr.getRhs().accept(this);
         plusExpr.getLhs().accept(this);
 
-        append_command();
+        append_command("iadd");
 
         return null;
     }
@@ -171,6 +177,20 @@ public class CodeGenrator extends Visitor<Void> {
 
     // Statement
     public Void visit(PrintLine printStat) {
+        Type type = printStat.getArg().accept(expressionTypeExtractor);
+        append_command("getstatic java/lang/System/out Ljava/io/PrintStream");
+        if ( type instanceof IntType) {
+            printStat.getArg().accept(this);
+            append_command("invokevirtual java/io/PrintStream/println(I)V");
+        }
+        else if (type instanceof StringType){
+            printStat.getArg().accept(this);
+            append_command("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
+        }
+//        else{
+//            printStat.getArg().
+//        }
+
         return null;
     }
 
