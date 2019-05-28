@@ -53,11 +53,10 @@ public class CodeGenrator extends Visitor<Void> {
             return BOOL_TYPE;
 //            else if (parameter.getType() instanceof UserDefinedType)
 //                result += parameter.getType(). TODO handle package for the format of user define types
-        else if (param instanceof ArrayType){
+        else{
             ArrayType type = (toorla.types.arrayType.ArrayType) param;
             return  ARRAY_TYPE + get_type_code(type.getSingleType());
         }
-
     }
 
     public String get_args_code(ArrayList<ParameterDeclaration> args){
