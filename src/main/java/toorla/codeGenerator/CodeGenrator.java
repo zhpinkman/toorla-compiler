@@ -36,6 +36,15 @@ public class CodeGenrator extends Visitor<Void> {
     public BufferedWriter writer;
     int tabs_before;
 
+
+    public void append_default_constructor(){
+        append_command(".method public <init>()V\n" +
+                "   aload_0 ; push this\n" +
+                "   invokespecial java/lang/Object/<init>()V ; call super\n" +
+                "   return\n" +
+                ".end method");
+    }
+
     public void create_class_file(String class_name){
         File file = new File("artifact/" + class_name + ".j");
         try{
@@ -195,6 +204,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Assign assignStat) {
+
         return null;
     }
 
@@ -258,6 +268,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(MethodDeclaration methodDeclaration) {
+        append_default_constructor();
         return null;
     }
 
