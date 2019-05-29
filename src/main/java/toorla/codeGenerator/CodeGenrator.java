@@ -18,6 +18,7 @@ import toorla.ast.statement.*;
 import toorla.ast.statement.localVarStats.LocalVarDef;
 import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
+import toorla.symbolTable.SymbolTable;
 import toorla.typeChecker.ExpressionTypeExtractor;
 import toorla.types.Type;
 import toorla.types.arrayType.ArrayType;
@@ -244,6 +245,9 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Block block) {
+        SymbolTable.pushFromQueue();
+        //
+        SymbolTable.pop();
         return null;
     }
 
@@ -285,19 +289,24 @@ public class CodeGenrator extends Visitor<Void> {
 
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
+        SymbolTable.pushFromQueue();
         create_class_file(classDeclaration.getName().getName());
         append_default_constructor();
+        SymbolTable.pop();
         return null;
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        SymbolTable.pushFromQueue();
         create_class_file(entryClassDeclaration.getName().getName());
         append_default_constructor();
-
+        SymbolTable.pop();
         return null;
     }
 
     public Void visit(FieldDeclaration fieldDeclaration) {
+        append_command(".field " + fieldDeclaration.getAccessModifier().toString() + " " + fieldDeclaration.getIdentifier().getName() + " "
+                + get_type_code(fieldDeclaration.getType()));
         return null;
     }
 
@@ -306,13 +315,21 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(MethodDeclaration methodDeclaration) {
+        SymbolTable.pushFromQueue();
         String static_keyword = " ";
         if (methodDeclaration.getName().getName().equals("main"))
             static_keyword = " static";
         String arg_defs = get_args_code(methodDeclaration.getArgs());
         append_command(".method " + methodDeclaration.getAccessModifier().toString() + static_keyword + methodDeclaration.getName().getName() + "(" +
                 arg_defs + ")" + get_type_code(methodDeclaration.getReturnType()));
+        tabs_before ++;
         append_limits();
+        for (Statement statement : methodDeclaration.getBody()){
+            statement.accept(this);
+        }
+        tabs_before --;
+        append_command(".end method");
+        SymbolTable.pop();
         return null;
     }
 
@@ -321,9 +338,11 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Program program) {
+        SymbolTable.pushFromQueue();
         for (ClassDeclaration classDeclaration : program.getClasses()){
             classDeclaration.accept(this);
         }
+        SymbolTable.pop();
         return null;
     }
 
