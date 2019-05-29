@@ -10,6 +10,7 @@ import toorla.visitor.IVisitor;
 import java.util.ArrayList;
 
 public class MethodDeclaration extends Declaration implements ClassMemberDeclaration {
+    private int locals;
     private Type returnType;
     private Identifier name;
     private AccessModifier accessModifier;
@@ -17,13 +18,23 @@ public class MethodDeclaration extends Declaration implements ClassMemberDeclara
     private ArrayList<Statement> body = new ArrayList<>();
 
     public MethodDeclaration(Identifier name) {
+        locals = 0;
         this.name = name;
         this.accessModifier = AccessModifier.ACCESS_MODIFIER_PUBLIC;
+    }
+
+    public int getLocals() {
+        return locals;
+    }
+
+    public void incLocals(){
+        locals ++;
     }
 
     public Type getReturnType() {
         return returnType;
     }
+
 
     public void setReturnType(Type returnType) {
         this.returnType = returnType;

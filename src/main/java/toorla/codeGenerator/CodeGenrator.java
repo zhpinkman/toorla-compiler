@@ -297,6 +297,9 @@ public class CodeGenrator extends Visitor<Void> {
             append_command(".super " + classDeclaration.getParentName().getName());
         create_class_file(classDeclaration.getName().getName());
         append_default_constructor();
+        for (ClassMemberDeclaration classMemberDeclaration : classDeclaration.getClassMembers()){
+            classMemberDeclaration.accept(this);
+        }
         SymbolTable.pop();
         return null;
     }
@@ -310,6 +313,9 @@ public class CodeGenrator extends Visitor<Void> {
             append_command(".super " + entryClassDeclaration.getParentName().getName());
         create_class_file(entryClassDeclaration.getName().getName());
         append_default_constructor();
+        for (ClassMemberDeclaration classMemberDeclaration : entryClassDeclaration.getClassMembers()){
+            classMemberDeclaration.accept(this);
+        }
         SymbolTable.pop();
         return null;
     }
