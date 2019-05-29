@@ -69,7 +69,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void append_limits(){
-        append_command(".limits locals 10");
+        append_command(".limits locals 10"); // TODO local variables should be counted for this part
         append_command(".limits stack 100");
     }
 
@@ -290,6 +290,11 @@ public class CodeGenrator extends Visitor<Void> {
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
         SymbolTable.pushFromQueue();
+        append_command(".class public " + classDeclaration.getName().getName());
+        if (classDeclaration.getParentName() == null)
+            append_command(".super + Any"); // TODO package for any class should be added before Any keyword
+        else
+            append_command(".super " + classDeclaration.getParentName().getName());
         create_class_file(classDeclaration.getName().getName());
         append_default_constructor();
         SymbolTable.pop();
@@ -298,6 +303,11 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
         SymbolTable.pushFromQueue();
+        append_command(".class public " + entryClassDeclaration.getName().getName());
+        if (entryClassDeclaration.getParentName() == null)
+            append_command(".super + Any"); // TODO package for any class should be added before Any keyword
+        else
+            append_command(".super " + entryClassDeclaration.getParentName().getName());
         create_class_file(entryClassDeclaration.getName().getName());
         append_default_constructor();
         SymbolTable.pop();
