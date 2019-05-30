@@ -133,18 +133,35 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Minus minusExpr) {
+        minusExpr.getLhs().accept(this);
+        minusExpr.getRhs().accept(this);
+
+        append_command("isub");
         return null;
     }
 
     public Void visit(Times timesExpr) {
+        timesExpr.getLhs().accept(this);
+        timesExpr.getRhs().accept(this);
+
+        append_command("imul");
         return null;
     }
 
     public Void visit(Division divExpr) {
+        divExpr.getLhs().accept(this);
+        divExpr.getRhs().accept(this);
+
+        append_command("idiv");
         return null;
     }
 
     public Void visit(Modulo moduloExpr) {
+
+        moduloExpr.getLhs().accept(this);
+        moduloExpr.getRhs().accept(this);
+
+        append_command("irem");
         return null;
     }
 
