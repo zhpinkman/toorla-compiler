@@ -41,6 +41,7 @@ public class CodeGenrator extends Visitor<Void> {
     static String STRING_TYPE = "Ljava/lang/String;";
     static String BOOL_TYPE = "Z";
     static String ARRAY_TYPE = "[";
+    static int unique_label = 0;
     ExpressionTypeExtractor expressionTypeExtractor;
     public BufferedWriter writer;
     int tabs_before;
@@ -178,10 +179,43 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(And andExpr) {
+        andExpr.getLhs().accept(this);
+
+        append_command("ifeq " + String.valueOf(unique_label) + "_0");
+
+        andExpr.getRhs().accept(this);
+
+        append_command("ifeq " + String.valueOf(unique_label) + "_0");
+
+        append_command("iconst_1");
+        append_command("goto " + String.valueOf(unique_label) + "_exit");
+
+        append_command(String.valueOf(unique_label) + "_0 : " + "iconst_0");
+
+        // TODO label for exiting the whole statement
+
+        unique_label ++;
         return null;
     }
 
     public Void visit(Or orExpr) {
+
+        orExpr.getLhs().accept(this);
+
+        append_command("ifne " + String.valueOf(unique_label) + "_1");
+
+        orExpr.getRhs().accept(this);
+
+        append_command("ifeq " + String.valueOf(unique_label) + "_0");
+
+        append_command(String.valueOf(unique_label) + "_1 : " + "iconst_1");
+        append_command("goto " + String.valueOf(unique_label) + "_exit");
+
+        append_command(String.valueOf(unique_label) + "_0 : " + "iconst_0");
+
+        // TODO label for exiting the whole statement
+
+        unique_label ++;
         return null;
     }
 
