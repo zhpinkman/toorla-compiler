@@ -190,7 +190,7 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("iconst_1");
         append_command("goto " + String.valueOf(unique_label) + "_exit");
 
-        append_command(String.valueOf(unique_label) + "_0 : " + "iconst_0");
+        append_command(String.valueOf(unique_label) + "_0: " + "iconst_0");
 
         // TODO label for exiting the whole statement
 
@@ -208,10 +208,10 @@ public class CodeGenrator extends Visitor<Void> {
 
         append_command("ifeq " + String.valueOf(unique_label) + "_0");
 
-        append_command(String.valueOf(unique_label) + "_1 : " + "iconst_1");
+        append_command(String.valueOf(unique_label) + "_1: " + "iconst_1");
         append_command("goto " + String.valueOf(unique_label) + "_exit");
 
-        append_command(String.valueOf(unique_label) + "_0 : " + "iconst_0");
+        append_command(String.valueOf(unique_label) + "_0: " + "iconst_0");
 
         // TODO label for exiting the whole statement
 
@@ -220,10 +220,23 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Neg negExpr) {
+
+        negExpr.getExpr().accept(this);
+        append_command("ineg");
+
         return null;
     }
 
     public Void visit(Not notExpr) {
+
+        notExpr.getExpr().accept(this);
+        append_command("ifne " + String.valueOf(unique_label) + "_0");
+        append_command("iconst_1");
+        append_command("goto " + String.valueOf(unique_label) + "_exit");
+
+        append_command(String.valueOf(unique_label) + "_0: " + "iconst_0");
+
+        // TODO label for exiting the whole expression
         return null;
     }
 
