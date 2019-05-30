@@ -25,7 +25,6 @@ import toorla.types.arrayType.ArrayType;
 import toorla.types.singleType.BoolType;
 import toorla.types.singleType.IntType;
 import toorla.types.singleType.StringType;
-import toorla.types.singleType.UserDefinedType;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
@@ -253,6 +252,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(IntValue intValue) {
+        append_command("iconst_" + intValue.getConstant());
         return null;
     }
 
@@ -261,10 +261,13 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(BoolValue booleanValue) {
+        int int_val = booleanValue.isConstant() ? 1 : 0;
+        append_command("iconst_" + int_val);
         return null;
     }
 
     public Void visit(StringValue stringValue) {
+        append_command("ldc" + '"' + stringValue.getConstant() + '"');
         return null;
     }
 
