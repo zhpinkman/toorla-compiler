@@ -272,6 +272,9 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(NewClassInstance newClassInstance) {
+        append_command("new " + newClassInstance.getClassName().getName());
+        append_command("dup");
+        append_command("invokespecial " + newClassInstance.getClassName().getName() + "/" + "<init>()V");
         return null;
     }
 
