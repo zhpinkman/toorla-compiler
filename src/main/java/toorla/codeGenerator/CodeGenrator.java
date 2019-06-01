@@ -19,6 +19,8 @@ import toorla.ast.statement.localVarStats.LocalVarDef;
 import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
+import toorla.symbolTable.exceptions.ItemNotFoundException;
+import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.typeChecker.ExpressionTypeExtractor;
 import toorla.types.Type;
 import toorla.types.arrayType.ArrayType;
@@ -41,6 +43,7 @@ public class CodeGenrator extends Visitor<Void> {
     static String BOOL_TYPE = "Z";
     static String ARRAY_TYPE = "[";
     static int unique_label = 0;
+    static int curr_var = 0;
     ExpressionTypeExtractor expressionTypeExtractor;
     public BufferedWriter writer;
     int tabs_before;
@@ -275,6 +278,7 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("new " + newClassInstance.getClassName().getName());
         append_command("dup");
         append_command("invokespecial " + newClassInstance.getClassName().getName() + "/" + "<init>()V");
+        append_command("astore_" + curr_var);
         return null;
     }
 
@@ -346,6 +350,11 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(LocalVarDef localVarDef) {
+        try{
+            LocalVariableSymbolTableItem lvsti= (LocalVariableSymbolTableItem) SymbolTable.top().get(localVarDef.getLocalVarName().getName());
+            curr_var  = lvsti.getIndex() + 1;
+        }
+        catch(ItemNotFoundException itfe){}
         return null;
     }
 
@@ -420,6 +429,9 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(LocalVarsDefinitions localVarsDefinitions) {
+        for (LocalVarDef localVarDef : localVarsDefinitions.getVarDefinitions()){
+            localVarDef.accept(this);
+        }
         return null;
     }
 
