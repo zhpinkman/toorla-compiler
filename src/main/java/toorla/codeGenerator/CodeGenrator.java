@@ -252,7 +252,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(IntValue intValue) {
-        append_command("iconst_" + intValue.getConstant());
+        append_command("ldc_" + intValue.getConstant());
         return null;
     }
 
