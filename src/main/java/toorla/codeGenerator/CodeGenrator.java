@@ -44,6 +44,7 @@ public class CodeGenrator extends Visitor<Void> {
     static String ARRAY_TYPE = "[";
     static int unique_label = 0;
     static int curr_var = 0;
+    static boolean is_using_self = false;
     ExpressionTypeExtractor expressionTypeExtractor;
     public BufferedWriter writer;
     int tabs_before;
@@ -87,9 +88,10 @@ public class CodeGenrator extends Visitor<Void> {
     public void create_class_file(String class_name){
         File file = new File("artifact/" + class_name + ".j");
         try{
+            System.out.println("zhivar");
             file.createNewFile();
             writer = new BufferedWriter(new FileWriter("artifact/" + class_name + ".j", true));
-            writer.write("zhivar");
+//            writer.write("zhivar");
         }
         catch (IOException se){
         }
@@ -368,13 +370,13 @@ public class CodeGenrator extends Visitor<Void> {
 
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
+        create_class_file(classDeclaration.getName().getName());
         SymbolTable.pushFromQueue();
         append_command(".class public " + classDeclaration.getName().getName());
         if (classDeclaration.getParentName() == null)
             append_command(".super + Any"); // TODO package for any class should be added before Any keyword
         else
             append_command(".super " + classDeclaration.getParentName().getName());
-        create_class_file(classDeclaration.getName().getName());
         append_default_constructor();
         for (ClassMemberDeclaration classMemberDeclaration : classDeclaration.getClassMembers()){
             classMemberDeclaration.accept(this);
@@ -384,13 +386,15 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        System.out.println("zzz");
+        create_class_file(entryClassDeclaration.getName().getName());
         SymbolTable.pushFromQueue();
         append_command(".class public " + entryClassDeclaration.getName().getName());
+        System.out.println("kajdflakjdlf");
         if (entryClassDeclaration.getParentName() == null)
             append_command(".super + Any"); // TODO package for any class should be added before Any keyword
         else
             append_command(".super " + entryClassDeclaration.getParentName().getName());
-        create_class_file(entryClassDeclaration.getName().getName());
         append_default_constructor();
         for (ClassMemberDeclaration classMemberDeclaration : entryClassDeclaration.getClassMembers()){
             classMemberDeclaration.accept(this);
@@ -436,6 +440,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Program program) {
+        System.out.println("ngar");
         SymbolTable.pushFromQueue();
         for (ClassDeclaration classDeclaration : program.getClasses()){
             classDeclaration.accept(this);
