@@ -27,6 +27,7 @@ import toorla.types.arrayType.ArrayType;
 import toorla.types.singleType.BoolType;
 import toorla.types.singleType.IntType;
 import toorla.types.singleType.StringType;
+import toorla.types.singleType.UserDefinedType;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
@@ -35,6 +36,8 @@ import java.util.ArrayList;
 
 public class CodeGenrator extends Visitor<Void> {
 
+    static String PUBLIC_ACCESS = "(ACCESS_MODIFIER_PUBLIC)";
+    static String PRIVATE_ACCESS = "(ACCESS_MODIFIER_PRIVATE)";
     static String current_class = "";
     static String INTEGER_TYPE = "I";
     static String STRING_TYPE = "Ljava/lang/String;";
@@ -47,6 +50,13 @@ public class CodeGenrator extends Visitor<Void> {
 //    public PrintWriter printWriter;
     int tabs_before;
 
+    public String get_access_modifier(String access_modifier){
+        if (access_modifier.equals(PUBLIC_ACCESS))
+            return "public";
+        else
+            return "private";
+    }
+
     public String get_type_code(Type param){
         if (param instanceof IntType)
             return  INTEGER_TYPE;
@@ -54,8 +64,8 @@ public class CodeGenrator extends Visitor<Void> {
             return  STRING_TYPE;
         else if (param instanceof BoolType)
             return BOOL_TYPE;
-//            else if (parameter.getType() instanceof UserDefinedType)
-//                result += parameter.getType(). TODO handle package for the format of user define types
+        else if (param  instanceof UserDefinedType)
+            return "L" + ((UserDefinedType) param).getClassDeclaration().getName().getName() + ";";
         else{
             ArrayType type = (toorla.types.arrayType.ArrayType) param;
             return  ARRAY_TYPE + get_type_code(type.getSingleType());
@@ -372,6 +382,7 @@ public class CodeGenrator extends Visitor<Void> {
             append_command(".super " +  "Any"); // TODO package for any class should be added before Any keyword
         else
             append_command(".super " + classDeclaration.getParentName().getName());
+        tabs_before ++;
         append_default_constructor();
         for (ClassMemberDeclaration classMemberDeclaration : classDeclaration.getClassMembers()){
             classMemberDeclaration.accept(this);
@@ -389,6 +400,7 @@ public class CodeGenrator extends Visitor<Void> {
             append_command(".super " +  "Any"); // TODO package for any class should be added before Any keyword
         else
             append_command(".super " + entryClassDeclaration.getParentName().getName());
+        tabs_before ++;
         append_default_constructor();
         for (ClassMemberDeclaration classMemberDeclaration : entryClassDeclaration.getClassMembers()){
             classMemberDeclaration.accept(this);
@@ -413,7 +425,8 @@ public class CodeGenrator extends Visitor<Void> {
         if (methodDeclaration.getName().getName().equals("main"))
             static_keyword = " static";
         String arg_defs = get_args_code(methodDeclaration.getArgs());
-        append_command(".method " + methodDeclaration.getAccessModifier().toString() + static_keyword + " " +  methodDeclaration.getName().getName() + "(" +
+        String access = get_access_modifier(methodDeclaration.getAccessModifier().toString());
+        append_command(".method " + access + static_keyword + " " +  methodDeclaration.getName().getName() + "(" +
                 arg_defs + ")" + get_type_code(methodDeclaration.getReturnType()));
         tabs_before ++;
         append_limits();
