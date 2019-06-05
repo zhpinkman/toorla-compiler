@@ -1,7 +1,7 @@
 entry class t1 :
-    private field temp int;
+    //private field temp int;
     public function main() returns int :
-
+    end
 end
 
 //class zz :

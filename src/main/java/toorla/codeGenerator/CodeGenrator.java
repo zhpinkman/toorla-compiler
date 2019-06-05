@@ -30,14 +30,12 @@ import toorla.types.singleType.StringType;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 public class CodeGenrator extends Visitor<Void> {
 
+    static String current_class = "";
     static String INTEGER_TYPE = "I";
     static String STRING_TYPE = "Ljava/lang/String;";
     static String BOOL_TYPE = "Z";
@@ -46,7 +44,7 @@ public class CodeGenrator extends Visitor<Void> {
     static int curr_var = 0;
     static boolean is_using_self = false;
     ExpressionTypeExtractor expressionTypeExtractor;
-    public BufferedWriter writer;
+//    public PrintWriter printWriter;
     int tabs_before;
 
     public String get_type_code(Type param){
@@ -86,14 +84,11 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void create_class_file(String class_name){
-        File file = new File("artifact/" + class_name + ".j");
-        try{
-            System.out.println("zhivar");
-            file.createNewFile();
-            writer = new BufferedWriter(new FileWriter("artifact/" + class_name + ".j", true));
-//            writer.write("zhivar");
-        }
-        catch (IOException se){
+        try(FileWriter fw = new FileWriter("artifact/" + class_name + ".j", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw))
+        {} catch (IOException e) {
+            //exception handling left as an exercise for the reader
         }
     }
 
@@ -115,17 +110,16 @@ public class CodeGenrator extends Visitor<Void> {
 
     public void append_command(String command)
     {
-        try {
+        try(FileWriter fw = new FileWriter("artifact/" + current_class + ".j", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw))
+        {
             for (int i = 0;i < tabs_before; i++)
-                writer.write("      ");
-            writer.write(command);
-            writer.newLine();
+                out.println("   ");
+            out.println(command);
+        } catch (IOException e) {
+            //exception handling left as an exercise for the reader
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
     }
 
     public Void visit(Plus plusExpr) {
@@ -370,11 +364,12 @@ public class CodeGenrator extends Visitor<Void> {
 
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
+        current_class = classDeclaration.getName().getName();
         create_class_file(classDeclaration.getName().getName());
         SymbolTable.pushFromQueue();
         append_command(".class public " + classDeclaration.getName().getName());
-        if (classDeclaration.getParentName() == null)
-            append_command(".super + Any"); // TODO package for any class should be added before Any keyword
+        if (classDeclaration.getParentName().getName() == null)
+            append_command(".super " +  "Any"); // TODO package for any class should be added before Any keyword
         else
             append_command(".super " + classDeclaration.getParentName().getName());
         append_default_constructor();
@@ -386,13 +381,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
-        System.out.println("zzz");
+        current_class = entryClassDeclaration.getName().getName();
         create_class_file(entryClassDeclaration.getName().getName());
         SymbolTable.pushFromQueue();
         append_command(".class public " + entryClassDeclaration.getName().getName());
-        System.out.println("kajdflakjdlf");
-        if (entryClassDeclaration.getParentName() == null)
-            append_command(".super + Any"); // TODO package for any class should be added before Any keyword
+        if (entryClassDeclaration.getParentName().getName() == null)
+            append_command(".super " +  "Any"); // TODO package for any class should be added before Any keyword
         else
             append_command(".super " + entryClassDeclaration.getParentName().getName());
         append_default_constructor();
@@ -419,7 +413,7 @@ public class CodeGenrator extends Visitor<Void> {
         if (methodDeclaration.getName().getName().equals("main"))
             static_keyword = " static";
         String arg_defs = get_args_code(methodDeclaration.getArgs());
-        append_command(".method " + methodDeclaration.getAccessModifier().toString() + static_keyword + methodDeclaration.getName().getName() + "(" +
+        append_command(".method " + methodDeclaration.getAccessModifier().toString() + static_keyword + " " +  methodDeclaration.getName().getName() + "(" +
                 arg_defs + ")" + get_type_code(methodDeclaration.getReturnType()));
         tabs_before ++;
         append_limits();
@@ -440,7 +434,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Program program) {
-        System.out.println("ngar");
+//        System.out.println("ngar");
         SymbolTable.pushFromQueue();
         for (ClassDeclaration classDeclaration : program.getClasses()){
             classDeclaration.accept(this);
