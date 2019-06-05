@@ -1,20 +1,6 @@
-entry class t1 :
-    //private field temp int;
-    public function main() returns int :
+entry class Sample2 :
+    function main() returns int :
+        print("Hello World!");
+        return 0;
     end
 end
-
-//class zz :
-
-//end
-
-
-//class t3 inherits t2:
-    //public field tt t2;
-
-    //public function xxx(x : int, y : bool, z : t2) returns int:
-       //temp = 2;
-      // zz = true;
-    //   yy = "mohsen";
-  //  end
-//end

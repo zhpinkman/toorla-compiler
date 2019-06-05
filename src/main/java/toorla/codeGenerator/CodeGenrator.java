@@ -81,16 +81,16 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void append_limits(){
-        append_command(".limits locals 10"); // TODO local variables should be counted for this part
-        append_command(".limits stack 100");
+        append_command(".limit locals 10"); // TODO local variables should be counted for this part
+        append_command(".limit stack 100");
     }
 
     public void append_default_constructor(){
         append_command(".method public <init>()V\n" +
-                "   aload_0 ; push this\n" +
-                "   invokespecial java/lang/Object/<init>()V ; call super\n" +
-                "   return\n" +
-                ".end method");
+                "       aload_0 ; push this\n" +
+                "       invokespecial java/lang/Object/<init>()V ; call super\n" +
+                "       return\n" +
+                "   .end method");
     }
 
     public void create_class_file(String class_name){
@@ -98,7 +98,6 @@ public class CodeGenrator extends Visitor<Void> {
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {} catch (IOException e) {
-            //exception handling left as an exercise for the reader
         }
     }
 
@@ -125,10 +124,9 @@ public class CodeGenrator extends Visitor<Void> {
             PrintWriter out = new PrintWriter(bw))
         {
             for (int i = 0;i < tabs_before; i++)
-                out.println("   ");
+                out.print("   ");
             out.println(command);
         } catch (IOException e) {
-            //exception handling left as an exercise for the reader
         }
     }
 
@@ -249,6 +247,10 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(MethodCall methodCall) {
+        // getting the refrence
+        for (Expression expression : methodCall.getArgs())
+            expression.accept(this);
+        append_command("invokevirtual " + methodCall);
         return null;
     }
 
@@ -261,7 +263,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(IntValue intValue) {
-        append_command("ldc_" + intValue.getConstant());
+        append_command("ldc " + intValue.getConstant());
         return null;
     }
 
@@ -276,7 +278,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(StringValue stringValue) {
-        append_command("ldc" + '"' + stringValue.getConstant() + '"');
+        append_command("ldc " + stringValue.getConstant());
         return null;
     }
 
@@ -303,7 +305,7 @@ public class CodeGenrator extends Visitor<Void> {
     // Statement
     public Void visit(PrintLine printStat) {
         Type type = printStat.getArg().accept(expressionTypeExtractor);
-        append_command("getstatic java/lang/System/out Ljava/io/PrintStream");
+        append_command("getstatic java/lang/System/out Ljava/io/PrintStream;");
         if ( type instanceof IntType) {
             printStat.getArg().accept(this);
             append_command("invokevirtual java/io/PrintStream/println(I)V");
@@ -312,9 +314,6 @@ public class CodeGenrator extends Visitor<Void> {
             printStat.getArg().accept(this);
             append_command("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
         }
-//        else{
-//            printStat.getArg().
-//        }
 
         return null;
     }
@@ -340,6 +339,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Return returnStat) {
+        Type type = returnStat.getReturnedExpr().accept(expressionTypeExtractor);
+        returnStat.getReturnedExpr().accept(this);
+        if (type instanceof IntType || type instanceof BoolType)
+            append_command("ireturn");
+        else
+            append_command("areturn");
         return null;
     }
 
@@ -374,6 +379,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
+        tabs_before = 0;
         current_class = classDeclaration.getName().getName();
         create_class_file(classDeclaration.getName().getName());
         SymbolTable.pushFromQueue();
@@ -392,6 +398,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        tabs_before = 0;
         current_class = entryClassDeclaration.getName().getName();
         create_class_file(entryClassDeclaration.getName().getName());
         SymbolTable.pushFromQueue();
