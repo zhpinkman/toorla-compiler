@@ -44,6 +44,7 @@ import java.util.ArrayList;
 
 public class CodeGenrator extends Visitor<Void> {
 
+    static int loop_depth = 0;
     static String PUBLIC_ACCESS = "(ACCESS_MODIFIER_PUBLIC)";
     static String PRIVATE_ACCESS = "(ACCESS_MODIFIER_PRIVATE)";
     static String current_class = "";
@@ -529,6 +530,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(While whileStat) {
+        loop_depth ++;
+        append_command("continue_" + String.valueOf(loop_depth) + " : ");
+        whileStat.expr.accept(this);
+        whileStat.body.accept(this);
+        append_command("break_" + String.valueOf(loop_depth) + " : ");
+        loop_depth --;
         return null;
     }
 
