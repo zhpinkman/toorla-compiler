@@ -1,10 +1,10 @@
 public class Test {
     public Test() {
     }
-    public int a;
+    public int b;
     public void main(String[] var0) {
-        int[] a = new int[20];
-        a[1] = a[5];
+        Test a = new Test();
+        a.b = 3;
         //System.out.println(a);
     }
 }

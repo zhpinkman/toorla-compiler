@@ -20,6 +20,7 @@ import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
 import toorla.symbolTable.exceptions.ItemNotFoundException;
+import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.FieldSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
@@ -435,13 +436,27 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("new " + newClassInstance.getClassName().getName());
         append_command("dup");
         append_command("invokespecial " + newClassInstance.getClassName().getName() + "/" + "<init>()V");
-        append_command("astore_" + curr_var);
+        //append_command("astore_" + curr_var);
+        // it is handled in assign
         return null;
     }
 
     public Void visit(FieldCall fieldCall) {
-        Type class_type = fieldCall.getInstance().accept(expressionTypeExtractor);
-        System.out.println("s");
+        fieldCall.getInstance().accept(this); //Class accepts and pushes it's refrence
+        String fieldName = fieldCall.getField().getName();
+        UserDefinedType class_type = (UserDefinedType) (fieldCall.getInstance().accept(expressionTypeExtractor));
+        String class_name = class_type.getClassDeclaration().getName().getName();
+        FieldSymbolTableItem field_symbol = null;
+        try {
+            ClassSymbolTableItem class_symbol = (ClassSymbolTableItem) SymbolTable.top().get("class_" + class_name);
+            field_symbol = (FieldSymbolTableItem) class_symbol.getSymbolTable().get("var_" + fieldName);
+        }catch (Exception e){
+
+        }
+        Type field_type = field_symbol.getFieldType();
+        if(want_lhs == false){
+            append_command("getfield " + class_name + "/" + fieldName + " " + make_type_signature(field_type));
+        }
         return null;
     }
 
@@ -522,7 +537,24 @@ public class CodeGenrator extends Visitor<Void> {
             }
 
         }else if(assignStat.getLvalue() instanceof  FieldCall){ // FieldCall
+            FieldCall fieldCall = (FieldCall) assignStat.getLvalue();
+            fieldCall.getInstance().accept(this); //Class accepts and pushes it's refrence
+            assignStat.getRvalue().accept(this); // Push value to store
 
+            String fieldName = fieldCall.getField().getName();
+            UserDefinedType class_type = (UserDefinedType) (fieldCall.getInstance().accept(expressionTypeExtractor));
+            String class_name = class_type.getClassDeclaration().getName().getName();
+            FieldSymbolTableItem field_symbol = null;
+            try {
+                ClassSymbolTableItem class_symbol = (ClassSymbolTableItem) SymbolTable.top().get("class_" + class_name);
+                field_symbol = (FieldSymbolTableItem) class_symbol.getSymbolTable().get("var_" + fieldName);
+            }catch (Exception e){
+
+            }
+            Type field_type = field_symbol.getFieldType();
+            if(want_lhs == false){
+                append_command("putfield " + class_name + "/" + fieldName + " " + make_type_signature(field_type));
+            }
         }
         return null;
     }
@@ -686,6 +718,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(FieldDeclaration fieldDeclaration) {
+        SymbolTable.define();
         append_command(".field " + get_access_modifier(fieldDeclaration.getAccessModifier().toString()) + " " + fieldDeclaration.getIdentifier().getName() + " "
                 + get_type_code(fieldDeclaration.getType()));
         return null;
