@@ -46,6 +46,7 @@ public class CodeGenrator extends Visitor<Void> {
     static int unique_label = 0;
     static int curr_var = 0;
     static boolean is_using_self = false;
+    static String class_with_main = "";
     ExpressionTypeExtractor expressionTypeExtractor;
 //    public PrintWriter printWriter;
     int tabs_before;
@@ -55,6 +56,36 @@ public class CodeGenrator extends Visitor<Void> {
             return "public";
         else
             return "private";
+    }
+
+    public void append_runner_class(){
+        try(FileWriter fw = new FileWriter("artifact/" + "Runner" + ".j", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw))
+        {
+            out.print(".class public Runner\n" +
+                    ".super java/lang/Object\n" +
+                    ".method public <init>()V\n" +
+                    "aload_0\n" +
+                    "invokespecial java/lang/Object/<init>()V\n" +
+                    "return\n" +
+                    ".end method\n" +
+                    "\n" +
+                    ".method public static main([Ljava/lang/String;)V\n" +
+                    ".limit stack 1000\n" +
+                    ".limit locals 100\n" +
+                    "new " + class_with_main + "\n" +
+                    "dup\n" +
+                    "invokespecial " + class_with_main + "/<init>()V\n" +
+                    "astore_1\n" +
+                    "aload 1\n" +
+                    "invokestatic " + class_with_main + "/main()I\n" +
+                    "istore_0\n" +
+                    "return\n" +
+                    ".end method");
+        } catch (IOException e) {
+        }
+
     }
 
     public String get_type_code(Type param){
