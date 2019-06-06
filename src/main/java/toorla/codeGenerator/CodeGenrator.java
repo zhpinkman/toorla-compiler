@@ -49,7 +49,6 @@ public class CodeGenrator extends Visitor<Void> {
     static int unique_label = 0;
     static int curr_var = 0;
     static boolean is_using_self = false;
-    private int var_index = 0;
 
     ExpressionTypeExtractor expressionTypeExtractor;
 //    public PrintWriter printWriter;
@@ -236,46 +235,6 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
 
-    public VarSymbolTableItem find_var_or_field(String name){
-        try {
-            SymbolTable xx = SymbolTable.top();
-            LocalVariableSymbolTableItem lvsti = null;
-            while(lvsti == null) {
-                try {
-                    lvsti = (LocalVariableSymbolTableItem) xx.get("var_" + name);
-                    if (lvsti.getIndex() <= var_index) {
-
-                    } else {
-                        lvsti = null;
-                        throw new Exception();
-                    }
-                } catch (Exception e) {
-                    xx = xx.getPreSymbolTable();
-                }
-            }
-            return lvsti;
-        } catch (Exception exception) { // it's a field
-            try {
-                SymbolTable xx = SymbolTable.top();
-                String z = "var_" + name;
-                boolean f = false;
-                FieldSymbolTableItem field_item = null;
-                while(field_item == null){
-                    try{
-                        field_item = (FieldSymbolTableItem) xx.get("var_" + name);
-                    }catch (Exception e){
-                        xx = xx.getPreSymbolTable();
-                    }
-                }
-                return field_item;
-            } catch (Exception e) {
-                //Field call is being handled in it's node, if there is no a.b we assume it was variable we were searching for
-                //System.out.println("error about couldn't finding variable or field"); // not sure which error to emit
-            }
-        }
-        return null;
-    }
-
     public Void visit(Plus plusExpr) {
         plusExpr.getRhs().accept(this);
         plusExpr.getLhs().accept(this);
@@ -413,7 +372,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(Identifier identifier) {
         try {
-            VarSymbolTableItem variableSymbol = find_var_or_field(identifier.getName());
+            VarSymbolTableItem variableSymbol = (VarSymbolTableItem) SymbolTable.top().get(VarSymbolTableItem.var_modifier + identifier.getName());
             SymbolTable xx = SymbolTable.top();
             try {
                 int var_index = ((LocalVariableSymbolTableItem) variableSymbol).getIndex(); // if it is variable
@@ -487,7 +446,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     // Statement
     public Void visit(PrintLine printStat) {
-        Type type = printStat.getArg().accept(expressionTypeExtractor); // TODO: their code is returning wrong type!!!!
+        Type type = printStat.getArg().accept(expressionTypeExtractor);
         append_command("getstatic java/lang/System/out Ljava/io/PrintStream;");
         if ( type instanceof IntType) {
             printStat.getArg().accept(this);
@@ -506,7 +465,13 @@ public class CodeGenrator extends Visitor<Void> {
         //VarSymbolTableItem lhs_symbol_table = find_var_or_field(assignStat.getLvalue().ac);
         if(assignStat.getLvalue() instanceof  Identifier){ // Variable Or Self field
             String lval_name = ((Identifier) assignStat.getLvalue()).getName();
-            VarSymbolTableItem variableSymbol = find_var_or_field(lval_name);
+            VarSymbolTableItem variableSymbol = null;
+            try {
+                SymbolTable xx = SymbolTable.top();
+                variableSymbol = (VarSymbolTableItem) SymbolTable.top().get(VarSymbolTableItem.var_modifier + lval_name);
+            } catch (ItemNotFoundException e) {
+                e.printStackTrace();
+            }
             Type var_type = assignStat.getRvalue().accept(expressionTypeExtractor);
 
             if(variableSymbol instanceof  LocalVariableSymbolTableItem){ //VARIABLE
@@ -588,7 +553,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(LocalVarDef localVarDef) {
-        var_index++;
+        SymbolTable.define();
         try{
             Type init_val_type = localVarDef.getInitialValue().accept(expressionTypeExtractor);
             //SymbolTable xx = SymbolTable.top();
@@ -628,7 +593,7 @@ public class CodeGenrator extends Visitor<Void> {
         else
             append_command(".super " + classDeclaration.getParentName().getName());
         tabs_before ++;
-        append_default_constructor();
+
 
         for (ClassMemberDeclaration classMemberDeclaration : classDeclaration.getClassMembers()){
             if (classMemberDeclaration instanceof FieldDeclaration)
@@ -638,6 +603,7 @@ public class CodeGenrator extends Visitor<Void> {
         }
         for (ClassMemberDeclaration field : fields)
             field.accept(this);
+        append_default_constructor();
         for (ClassMemberDeclaration method : methods)
             method.accept(this);
 
@@ -647,7 +613,8 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
         append_runner_class(entryClassDeclaration.getName().getName());
-
+        ArrayList<ClassMemberDeclaration> fields = new ArrayList<>();
+        ArrayList<ClassMemberDeclaration> methods = new ArrayList<>();
         tabs_before = 0;
         current_class = entryClassDeclaration.getName().getName();
         create_class_file(entryClassDeclaration.getName().getName());
@@ -658,10 +625,19 @@ public class CodeGenrator extends Visitor<Void> {
         else
             append_command(".super " + entryClassDeclaration.getParentName().getName());
         tabs_before ++;
-        append_default_constructor();
+
         for (ClassMemberDeclaration classMemberDeclaration : entryClassDeclaration.getClassMembers()){
-            classMemberDeclaration.accept(this);
+            if (classMemberDeclaration instanceof FieldDeclaration)
+                fields.add(classMemberDeclaration);
+            else if (classMemberDeclaration instanceof MethodDeclaration)
+                methods.add(classMemberDeclaration);
         }
+        for (ClassMemberDeclaration field : fields)
+            field.accept(this);
+        append_default_constructor();
+        for (ClassMemberDeclaration method : methods)
+            method.accept(this);
+
         SymbolTable.pop();
         return null;
     }
@@ -673,16 +649,17 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(ParameterDeclaration parameterDeclaration) {
-        var_index++;
+        SymbolTable.define();
         return null;
     }
 
     public Void visit(MethodDeclaration methodDeclaration) {
-        var_index = 0;
+        SymbolTable.reset();
+
         SymbolTable.pushFromQueue();
         String static_keyword = " ";
-//        if (methodDeclaration.getName().getName().equals("main"))
-//            static_keyword = " static";
+        if (methodDeclaration.getName().getName().equals("main"))
+            static_keyword = " static";
         String arg_defs = get_args_code(methodDeclaration.getArgs());
         String access = get_access_modifier(methodDeclaration.getAccessModifier().toString());
         append_command(".method " + access + static_keyword + " " +  methodDeclaration.getName().getName() + "(" +

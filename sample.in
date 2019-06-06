@@ -3,10 +3,10 @@ entry class Test :
     function main() returns int :
         var a = "aaa";
         yyy = 20;
-        print(yyy);
+        //print(yyy);
         begin
-            //print(a);
-            //var a = 5;
+            print(a);
+            var a = 5;
         end
         return 0;
     end
