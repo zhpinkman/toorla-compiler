@@ -133,10 +133,25 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
 
+    public void create_Any_class(){
+        try(FileWriter fw = new FileWriter("artifact/" + "Any" + ".j", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw)) {
+            out.print(".class public Any\n" +
+                    ".super java/lang/Object\n" +
+                    ".method public <init>()V\n" +
+                    "aload_0\n" +
+                    "invokespecial java/lang/Object/<init>()V\n" +
+                    "return\n" +
+                    ".end method\n");
+        }catch (Exception exception){}
+    }
+
     public void create_directory(){
         File theDir = new File("artifact");
         try{
             theDir.mkdir();
+            create_Any_class();
         }
         catch(SecurityException se){
         }
