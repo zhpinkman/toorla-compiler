@@ -219,6 +219,9 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Equals equalsExpr) {
+//        equalsExpr.getLhs().accept(this);
+//        equalsExpr.getRhs().accept(this);
+
         return null;
     }
 
@@ -361,6 +364,7 @@ public class CodeGenrator extends Visitor<Void> {
             printStat.getArg().accept(this);
             append_command("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
         }
+        //TODO ARRAY TYPE
 
         return null;
     }
@@ -409,8 +413,17 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(LocalVarDef localVarDef) {
         try{
-            LocalVariableSymbolTableItem lvsti= (LocalVariableSymbolTableItem) SymbolTable.top().get(localVarDef.getLocalVarName().getName());
+            Type init_val_type = localVarDef.getInitialValue().accept(expressionTypeExtractor);
+            //SymbolTable xx = SymbolTable.top();
+            LocalVariableSymbolTableItem lvsti= (LocalVariableSymbolTableItem) SymbolTable.top().get("var_"+localVarDef.getLocalVarName().getName()); // You had forgotten "var_" prefix. check other places too
             curr_var  = lvsti.getIndex() + 1;
+            localVarDef.getInitialValue().accept(this); // PUSH init value to store
+
+            if(init_val_type instanceof IntType || init_val_type instanceof BoolType){
+                append_command("istore_"+curr_var);
+            }else{
+                append_command("astore_"+curr_var);
+            }
         }
         catch(ItemNotFoundException itfe){}
         return null;
