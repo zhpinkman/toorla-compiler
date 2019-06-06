@@ -582,11 +582,20 @@ public class CodeGenrator extends Visitor<Void> {
         return null;
     }
 
+    public Assign change_to_assign(Expression expression, int amount){
+        Assign assign = new Assign(expression, new Plus(expression, new IntValue(amount)));
+        return assign;
+    }
+
     public Void visit(IncStatement incStatement) {
+        Assign assign = change_to_assign(incStatement.getOperand(), 1);
+        assign.accept(this);
         return null;
     }
 
     public Void visit(DecStatement decStatement) {
+        Assign assign = change_to_assign(decStatement.getOperand(), -1);
+        assign.accept(this);
         return null;
     }
 
