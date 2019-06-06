@@ -407,9 +407,10 @@ public class CodeGenrator extends Visitor<Void> {
             }catch (Exception e){ // it is field
                 Type var_type = variableSymbol.getType();
                 if( (var_type instanceof IntType) || (var_type instanceof BoolType)){
+                    append_command("aload_0"); // push self as obj ref
                     append_command("getfield" + current_class + "/" + identifier.getName() + " I");
                 }else{
-                    //ObjectReference package.ClassName -> Lpackage.ClassName;
+                    //TODO: ObjectReference package.ClassName -> Lpackage.ClassName;
                     // Array of type a -> [a
                 }
             }
@@ -452,6 +453,8 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(FieldCall fieldCall) {
+        Type class_type = fieldCall.getInstance().accept(expressionTypeExtractor);
+        System.out.println("s");
         return null;
     }
 
@@ -481,7 +484,14 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Assign assignStat) {
+        //VarSymbolTableItem lhs_symbol_table = find_var_or_field(assignStat.getLvalue().ac);
+        if(assignStat.getLvalue() instanceof  Identifier){ // Variable Or Self field
 
+        }else if(assignStat.getLvalue() instanceof  ArrayCall){ // array[10] or field
+
+        }else if(assignStat.getLvalue() instanceof  FieldCall){
+
+        }
         return null;
     }
 
@@ -606,8 +616,8 @@ public class CodeGenrator extends Visitor<Void> {
         var_index = 0;
         SymbolTable.pushFromQueue();
         String static_keyword = " ";
-        if (methodDeclaration.getName().getName().equals("main"))
-            static_keyword = " static";
+//        if (methodDeclaration.getName().getName().equals("main"))
+//            static_keyword = " static";
         String arg_defs = get_args_code(methodDeclaration.getArgs());
         String access = get_access_modifier(methodDeclaration.getAccessModifier().toString());
         append_command(".method " + access + static_keyword + " " +  methodDeclaration.getName().getName() + "(" +
