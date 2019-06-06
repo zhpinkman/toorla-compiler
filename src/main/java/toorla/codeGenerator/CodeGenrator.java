@@ -531,10 +531,10 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(While whileStat) {
         loop_depth ++;
-        append_command("continue_" + String.valueOf(loop_depth) + " : ");
+        append_command("continue_" + loop_depth + " : ");
         whileStat.expr.accept(this);
         whileStat.body.accept(this);
-        append_command("break_" + String.valueOf(loop_depth) + " : ");
+        append_command("break_" + loop_depth + " : ");
         loop_depth --;
         return null;
     }
@@ -550,12 +550,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Break breakStat) {
-        append_command("goto " + "break_" +  String.valueOf(loop_depth));
+        append_command("goto " + "break_" +  loop_depth);
         return null;
     }
 
     public Void visit(Continue continueStat) {
-        append_command("goto " + "continue_" + String.valueOf(loop_depth));
+        append_command("goto " + "continue_" + loop_depth);
         return null;
     }
 
