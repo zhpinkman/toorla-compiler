@@ -303,14 +303,14 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(Equals equalsExpr) {
         equalsExpr.getLhs().accept(this);
         equalsExpr.getRhs().accept(this);
-        append_command("if_icmpne " + String.valueOf(unique_label) + "_else");
+        append_command("if_icmpne " + unique_label + "_else");
         return null;
     }
 
     public Void visit(GreaterThan gtExpr) {
         gtExpr.getLhs().accept(this);
         gtExpr.getRhs().accept(this);
-        append_command("if_icmple " + String.valueOf(unique_label) + "_else");
+        append_command("if_icmple " + unique_label + "_else");
 
         return null;
     }
@@ -318,23 +318,23 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(LessThan lessThanExpr) {
         lessThanExpr.getLhs().accept(this);
         lessThanExpr.getRhs().accept(this);
-        append_command("if_icmpge " + String.valueOf(unique_label) + "_else");
+        append_command("if_icmpge " + unique_label + "_else");
         return null;
     }
 
     public Void visit(And andExpr) {
         andExpr.getLhs().accept(this);
 
-        append_command("ifeq " + String.valueOf(unique_label) + "_0");
+        append_command("ifeq " + unique_label + "_0");
 
         andExpr.getRhs().accept(this);
 
-        append_command("ifeq " + String.valueOf(unique_label) + "_0");
+        append_command("ifeq " + unique_label + "_0");
 
         append_command("iconst_1");
-        append_command("goto " + String.valueOf(unique_label) + "_exit");
+        append_command("goto " + unique_label + "_exit");
 
-        append_command(String.valueOf(unique_label) + "_0: " + "iconst_0");
+        append_command(unique_label + "_0: " + "iconst_0");
 
         // TODO label for exiting the whole statement
 
@@ -346,16 +346,16 @@ public class CodeGenrator extends Visitor<Void> {
 
         orExpr.getLhs().accept(this);
 
-        append_command("ifne " + String.valueOf(unique_label) + "_1");
+        append_command("ifne " + unique_label + "_1");
 
         orExpr.getRhs().accept(this);
 
-        append_command("ifeq " + String.valueOf(unique_label) + "_0");
+        append_command("ifeq " + unique_label + "_0");
 
-        append_command(String.valueOf(unique_label) + "_1: " + "iconst_1");
-        append_command("goto " + String.valueOf(unique_label) + "_exit");
+        append_command(unique_label + "_1: " + "iconst_1");
+        append_command("goto " + unique_label + "_exit");
 
-        append_command(String.valueOf(unique_label) + "_0: " + "iconst_0");
+        append_command(unique_label + "_0: " + "iconst_0");
 
         // TODO label for exiting the whole statement
 
@@ -374,11 +374,11 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(Not notExpr) {
 
         notExpr.getExpr().accept(this);
-        append_command("ifne " + String.valueOf(unique_label) + "_0");
+        append_command("ifne " + unique_label + "_0");
         append_command("iconst_1");
-        append_command("goto " + String.valueOf(unique_label) + "_exit");
+        append_command("goto " + unique_label + "_exit");
 
-        append_command(String.valueOf(unique_label) + "_0: " + "iconst_0");
+        append_command(unique_label + "_0: " + "iconst_0");
 
         // TODO label for exiting the whole expression
         return null;
@@ -478,7 +478,7 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(NotEquals notEquals) {
         notEquals.getLhs().accept(this);
         notEquals.getRhs().accept(this);
-        append_command("if_icmpeq " + String.valueOf(unique_label) + "_else");
+        append_command("if_icmpeq " + unique_label + "_else");
         return null;
     }
 
@@ -523,12 +523,12 @@ public class CodeGenrator extends Visitor<Void> {
         conditional.getCondition().accept(this);
 
         conditional.getThenStatement().accept(this);
-        append_command("goto " + String.valueOf(unique_label) + "_exit");
+        append_command("goto " + unique_label + "_exit");
 
-        append_command(String.valueOf(unique_label) + "_else : ");
+        append_command(unique_label + "_else : ");
         conditional.getElseStatement().accept(this);
 
-        append_command(String.valueOf(unique_label) + "_exit : ");
+        append_command(unique_label + "_exit : ");
 
         unique_label ++;
         return null;
@@ -627,6 +627,8 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        ArrayList<ClassMemberDeclaration> fields = new ArrayList<>();
+        ArrayList<ClassMemberDeclaration> methods = new ArrayList<>();
         append_runner_class(entryClassDeclaration.getName().getName());
 
         tabs_before = 0;
@@ -641,8 +643,16 @@ public class CodeGenrator extends Visitor<Void> {
         tabs_before ++;
         append_default_constructor();
         for (ClassMemberDeclaration classMemberDeclaration : entryClassDeclaration.getClassMembers()){
-            classMemberDeclaration.accept(this);
+            if (classMemberDeclaration instanceof FieldDeclaration)
+                fields.add(classMemberDeclaration);
+            else if (classMemberDeclaration instanceof MethodDeclaration)
+                methods.add(classMemberDeclaration);
         }
+        for (ClassMemberDeclaration field : fields)
+            field.accept(this);
+        for (ClassMemberDeclaration method : methods)
+            method.accept(this);
+
         SymbolTable.pop();
         return null;
     }
