@@ -432,6 +432,17 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(NewArray newArray) {
+        newArray.getLength().accept(this);
+        if (newArray.getType() instanceof IntType)
+            append_command("newarray int");
+        else if (newArray.getType() instanceof BoolType)
+            append_command("newarray boolean");
+        else if (newArray.getType() instanceof StringType)
+            append_command("anewarray  java/lang/String");
+        else if (newArray.getType() instanceof UserDefinedType)
+            append_command("anewarray " + ((UserDefinedType) newArray.getType()).getClassDeclaration().getName().getName());
+
+        // TODO storing array in locals
         return null;
     }
 
