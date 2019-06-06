@@ -552,10 +552,10 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(While whileStat) {
         loop_depth ++;
-        append_command("continue_" + String.valueOf(loop_depth) + " : ");
+        append_command("continue_" + loop_depth + " : ");
         whileStat.expr.accept(this);
         whileStat.body.accept(this);
-        append_command("break_" + String.valueOf(loop_depth) + " : ");
+        append_command("break_" + loop_depth + " : ");
         loop_depth --;
         return null;
     }
@@ -571,12 +571,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Break breakStat) {
-        append_command("goto " + "break_" +  String.valueOf(loop_depth));
+        append_command("goto " + "break_" +  loop_depth);
         return null;
     }
 
     public Void visit(Continue continueStat) {
-        append_command("goto " + "continue_" + String.valueOf(loop_depth));
+        append_command("goto " + "continue_" + loop_depth);
         return null;
     }
 
@@ -603,11 +603,20 @@ public class CodeGenrator extends Visitor<Void> {
         return null;
     }
 
+    public Assign change_to_assign(Expression expression, int amount){
+        Assign assign = new Assign(expression, new Plus(expression, new IntValue(amount)));
+        return assign;
+    }
+
     public Void visit(IncStatement incStatement) {
+        Assign assign = change_to_assign(incStatement.getOperand(), 1);
+        assign.accept(this);
         return null;
     }
 
     public Void visit(DecStatement decStatement) {
+        Assign assign = change_to_assign(decStatement.getOperand(), -1);
+        assign.accept(this);
         return null;
     }
 
