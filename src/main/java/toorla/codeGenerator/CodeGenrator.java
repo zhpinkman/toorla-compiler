@@ -630,7 +630,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(FieldDeclaration fieldDeclaration) {
-        append_command(".field " + fieldDeclaration.getAccessModifier().toString() + " " + fieldDeclaration.getIdentifier().getName() + " "
+        append_command(".field " + get_access_modifier(fieldDeclaration.getAccessModifier().toString()) + " " + fieldDeclaration.getIdentifier().getName() + " "
                 + get_type_code(fieldDeclaration.getType()));
         return null;
     }
