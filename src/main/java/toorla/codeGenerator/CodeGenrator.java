@@ -626,8 +626,7 @@ public class CodeGenrator extends Visitor<Void> {
         ArrayList<ClassMemberDeclaration> fields = new ArrayList<>();
         ArrayList<ClassMemberDeclaration> methods = new ArrayList<>();
         append_runner_class(entryClassDeclaration.getName().getName());
-        ArrayList<ClassMemberDeclaration> fields = new ArrayList<>();
-        ArrayList<ClassMemberDeclaration> methods = new ArrayList<>();
+
         tabs_before = 0;
         current_class = entryClassDeclaration.getName().getName();
         create_class_file(entryClassDeclaration.getName().getName());
@@ -651,16 +650,6 @@ public class CodeGenrator extends Visitor<Void> {
         for (ClassMemberDeclaration method : methods)
             method.accept(this);
 
-        for (ClassMemberDeclaration classMemberDeclaration : entryClassDeclaration.getClassMembers()){
-            if (classMemberDeclaration instanceof FieldDeclaration)
-                fields.add(classMemberDeclaration);
-            else if (classMemberDeclaration instanceof MethodDeclaration)
-                methods.add(classMemberDeclaration);
-        }
-        for (ClassMemberDeclaration field : fields)
-            field.accept(this);
-        for (ClassMemberDeclaration method : methods)
-            method.accept(this);
 
         SymbolTable.pop();
         return null;
