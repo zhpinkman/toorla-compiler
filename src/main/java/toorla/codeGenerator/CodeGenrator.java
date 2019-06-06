@@ -574,10 +574,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Break breakStat) {
+        append_command("goto " + "break_" +  String.valueOf(loop_depth));
         return null;
     }
 
     public Void visit(Continue continueStat) {
+        append_command("goto " + "continue_" + String.valueOf(loop_depth));
         return null;
     }
 
@@ -614,6 +616,8 @@ public class CodeGenrator extends Visitor<Void> {
 
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
+        ArrayList<ClassMemberDeclaration> fields = new ArrayList<>();
+        ArrayList<ClassMemberDeclaration> methods = new ArrayList<>();
         tabs_before = 0;
         current_class = classDeclaration.getName().getName();
         create_class_file(classDeclaration.getName().getName());
@@ -625,9 +629,18 @@ public class CodeGenrator extends Visitor<Void> {
             append_command(".super " + classDeclaration.getParentName().getName());
         tabs_before ++;
         append_default_constructor();
+
         for (ClassMemberDeclaration classMemberDeclaration : classDeclaration.getClassMembers()){
-            classMemberDeclaration.accept(this);
+            if (classMemberDeclaration instanceof FieldDeclaration)
+                fields.add(classMemberDeclaration);
+            else if (classMemberDeclaration instanceof MethodDeclaration)
+                methods.add(classMemberDeclaration);
         }
+        for (ClassMemberDeclaration field : fields)
+            field.accept(this);
+        for (ClassMemberDeclaration method : methods)
+            method.accept(this);
+
         SymbolTable.pop();
         return null;
     }
