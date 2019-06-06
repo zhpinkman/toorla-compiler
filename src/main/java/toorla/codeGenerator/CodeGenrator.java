@@ -47,7 +47,7 @@ public class CodeGenrator extends Visitor<Void> {
     static String STRING_TYPE = "Ljava/lang/String;";
     static String BOOL_TYPE = "Z";
     static String ARRAY_TYPE = "[";
-    static int unique_label = 0;
+    static int  unique_label = 0;
     static int curr_var = 0;
     static boolean is_using_self = false;
     boolean want_lhs = false;
@@ -283,11 +283,11 @@ public class CodeGenrator extends Visitor<Void> {
         equalsExpr.getLhs().accept(this);
         equalsExpr.getRhs().accept(this);
 
-        append_command("if_icmpne " + unique_label + "_0");
+        append_command("if_icmpne " + "L" + unique_label + "_0");
         append_command("iconst_1");
-        append_command("goto " + unique_label + "_exit");
-        append_command(unique_label + "_0 : " + "iconst_0");
-        append_command(unique_label + "_exit : ");
+        append_command("goto " + "L" + unique_label + "_exit");
+        append_command("L" + unique_label + "_0 : " + "iconst_0");
+        append_command("L" + unique_label + "_exit : ");
         unique_label ++;
 
         return null;
@@ -296,11 +296,11 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(GreaterThan gtExpr) {
         gtExpr.getLhs().accept(this);
         gtExpr.getRhs().accept(this);
-        append_command("if_icmple " + unique_label + "_0");
+        append_command("if_icmple " + "L" + unique_label + "_0");
         append_command("iconst_1");
-        append_command("goto " + unique_label + "_exit");
-        append_command(unique_label + "_0 : " + "iconst_0");
-        append_command(unique_label + "_exit : ");
+        append_command("goto " + "L" + unique_label + "_exit");
+        append_command("L" + unique_label + "_0 : " + "iconst_0");
+        append_command("L" + unique_label + "_exit : ");
         unique_label ++;
         return null;
     }
@@ -308,11 +308,11 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(LessThan lessThanExpr) {
         lessThanExpr.getLhs().accept(this);
         lessThanExpr.getRhs().accept(this);
-        append_command("if_icmpge " + unique_label + "_0");
+        append_command("if_icmpge " + "L" + unique_label + "_0");
         append_command("iconst_1");
-        append_command("goto " + unique_label + "_exit");
-        append_command(unique_label + "_0 : " + "iconst_0");
-        append_command(unique_label + "_exit : ");
+        append_command("goto " + "L" + unique_label + "_exit");
+        append_command("L" + unique_label + "_0 : " + "iconst_0");
+        append_command("L" + unique_label + "_exit : ");
         unique_label ++;
         return null;
     }
@@ -320,18 +320,18 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(And andExpr) {
         andExpr.getLhs().accept(this);
 
-        append_command("ifeq " + unique_label + "_0");
+        append_command("ifeq " + "L" + unique_label + "_0");
 
         andExpr.getRhs().accept(this);
 
-        append_command("ifeq " + unique_label + "_0");
+        append_command("ifeq " + "L" + unique_label + "_0");
 
         append_command("iconst_1");
-        append_command("goto " + unique_label + "_exit");
+        append_command("goto " + "L" + unique_label + "_exit");
 
-        append_command(unique_label + "_0: " + "iconst_0");
+        append_command("L" + unique_label + "_0: " + "iconst_0");
 
-        append_command(unique_label + "_exit : ");
+        append_command("L" + unique_label + "_exit : ");
 
         unique_label ++;
         return null;
@@ -341,18 +341,18 @@ public class CodeGenrator extends Visitor<Void> {
 
         orExpr.getLhs().accept(this);
 
-        append_command("ifne " + unique_label + "_1");
+        append_command("ifne " + "L" + unique_label + "_1");
 
         orExpr.getRhs().accept(this);
 
-        append_command("ifeq " + unique_label + "_0");
+        append_command("ifeq " + "L" + unique_label + "_0");
 
-        append_command(unique_label + "_1: " + "iconst_1");
-        append_command("goto " + unique_label + "_exit");
+        append_command("L" + unique_label + "_1: " + "iconst_1");
+        append_command("goto " + "L" + unique_label + "_exit");
 
-        append_command(unique_label + "_0: " + "iconst_0");
+        append_command("L" + unique_label + "_0: " + "iconst_0");
 
-        append_command(unique_label + "_exit : ");
+        append_command("L" + unique_label + "_exit : ");
 
         unique_label ++;
         return null;
@@ -369,12 +369,12 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(Not notExpr) {
 
         notExpr.getExpr().accept(this);
-        append_command("ifne " + unique_label + "_0");
+        append_command("ifne " + "L" + unique_label + "_0");
         append_command("iconst_1");
-        append_command("goto " + unique_label + "_exit");
+        append_command("goto " + "L" + unique_label + "_exit");
 
-        append_command(unique_label + "_0: " + "iconst_0");
-        append_command(unique_label + "_exit : ");
+        append_command("L" + unique_label + "_0: " + "iconst_0");
+        append_command("L" + unique_label + "_exit : ");
         unique_label ++;
         return null;
     }
@@ -493,11 +493,11 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(NotEquals notEquals) {
         notEquals.getLhs().accept(this);
         notEquals.getRhs().accept(this);
-        append_command("if_icmpeq " + unique_label + "_0");
+        append_command("if_icmpeq " + "L" + unique_label + "_0");
         append_command("iconst_1");
-        append_command("goto " + unique_label + "_exit");
-        append_command(unique_label + "_0 : " + "iconst_0");
-        append_command(unique_label + "_exit : ");
+        append_command("goto " + "L" + unique_label + "_exit");
+        append_command("L" + unique_label + "_0 : " + "iconst_0");
+        append_command("L" + unique_label + "_exit : ");
         unique_label ++;
         return null;
     }
@@ -591,15 +591,15 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(Conditional conditional) {
         conditional.getCondition().accept(this);
 
-        append_command("if_icmpne " + unique_label + "_else");
+        append_command("if_icmpne " + "L" + unique_label + "_else");
 
         conditional.getThenStatement().accept(this);
-        append_command("goto " + unique_label + "_exit");
+        append_command("goto " + "L" + unique_label + "_exit");
 
-        append_command(unique_label + "_else : ");
+        append_command("L" + unique_label + "_else : ");
         conditional.getElseStatement().accept(this);
 
-        append_command(unique_label + "_exit : ");
+        append_command("L" + unique_label + "_exit : ");
 
         unique_label ++;
         return null;
