@@ -544,10 +544,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Break breakStat) {
+        append_command("goto " + "break_" +  String.valueOf(loop_depth));
         return null;
     }
 
     public Void visit(Continue continueStat) {
+        append_command("goto " + "continue_" + String.valueOf(loop_depth));
         return null;
     }
 
