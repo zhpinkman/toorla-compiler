@@ -1,8 +1,8 @@
 entry class Test :
-    public field yyy int;
+    //public field yyy int;
     function main() returns int :
-        yyy = 20;
-        print(yyy);
+        if (true && false)
+            print(2);
         return 0;
     end
 end
