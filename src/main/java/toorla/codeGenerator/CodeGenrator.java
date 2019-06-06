@@ -313,10 +313,17 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(GreaterThan gtExpr) {
+        gtExpr.getLhs().accept(this);
+        gtExpr.getRhs().accept(this);
+        append_command("if_icmple " + String.valueOf(unique_label) + "_else");
+
         return null;
     }
 
     public Void visit(LessThan lessThanExpr) {
+        lessThanExpr.getLhs().accept(this);
+        lessThanExpr.getRhs().accept(this);
+        append_command("if_icmpge " + String.valueOf(unique_label) + "_else");
         return null;
     }
 
