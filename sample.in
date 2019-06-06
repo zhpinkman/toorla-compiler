@@ -1,6 +1,10 @@
-entry class Sample2 :
+entry class Test :
     function main() returns int :
-        print("Hello World!");
+        var a = "aaa";
+        begin
+            print(a);
+            var a = 5;
+        end
         return 0;
     end
 end

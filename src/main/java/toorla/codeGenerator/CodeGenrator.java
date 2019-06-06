@@ -20,7 +20,9 @@ import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
 import toorla.symbolTable.exceptions.ItemNotFoundException;
+import toorla.symbolTable.symbolTableItem.varItems.FieldSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 import toorla.typeChecker.ExpressionTypeExtractor;
 import toorla.types.Type;
 import toorla.types.arrayType.ArrayType;
@@ -52,7 +54,8 @@ public class CodeGenrator extends Visitor<Void> {
     static int unique_label = 0;
     static int curr_var = 0;
     static boolean is_using_self = false;
-    static String class_with_main = "";
+    private int var_index = 0;
+
     ExpressionTypeExtractor expressionTypeExtractor;
 //    public PrintWriter printWriter;
     int tabs_before;
@@ -99,8 +102,8 @@ public class CodeGenrator extends Visitor<Void> {
             return "private";
     }
 
-    public void append_runner_class(){
-        try(FileWriter fw = new FileWriter("artifact/" + "Runner" + ".j", true);
+    public void append_runner_class(String entry_class_name){
+        try(FileWriter fw = new FileWriter("artifact/" + "Runner" + ".j", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {
@@ -115,12 +118,12 @@ public class CodeGenrator extends Visitor<Void> {
                     ".method public static main([Ljava/lang/String;)V\n" +
                     ".limit stack 1000\n" +
                     ".limit locals 100\n" +
-                    "new " + class_with_main + "\n" +
+                    "new " + entry_class_name + "\n" +
                     "dup\n" +
-                    "invokespecial " + class_with_main + "/<init>()V\n" +
+                    "invokespecial " + entry_class_name + "/<init>()V\n" +
                     "astore_1\n" +
                     "aload 1\n" +
-                    "invokestatic " + class_with_main + "/main()I\n" +
+                    "invokestatic " + entry_class_name + "/main()I\n" +
                     "istore_0\n" +
                     "return\n" +
                     ".end method");
@@ -153,7 +156,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void append_limits(){
-        append_command(".limit locals 10"); // TODO local variables should be counted for this part
+        append_command(".limit locals 10"); // TODO local variables should be counted for this part // Just make it big enough
         append_command(".limit stack 100");
     }
 
@@ -166,7 +169,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void create_class_file(String class_name){
-        try(FileWriter fw = new FileWriter("artifact/" + class_name + ".j", true);
+        try(FileWriter fw = new FileWriter("artifact/" + class_name + ".j", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {} catch (IOException e) {
@@ -175,7 +178,7 @@ public class CodeGenrator extends Visitor<Void> {
 
 
     public void create_Any_class(){
-        try(FileWriter fw = new FileWriter("artifact/" + "Any" + ".j", true);
+        try(FileWriter fw = new FileWriter("artifact/" + "Any" + ".j", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw)) {
             out.print(".class public Any\n" +
@@ -217,6 +220,47 @@ public class CodeGenrator extends Visitor<Void> {
             out.println(command);
         } catch (IOException e) {
         }
+    }
+
+
+    public VarSymbolTableItem find_var_or_field(String name){
+        try {
+            SymbolTable xx = SymbolTable.top();
+            LocalVariableSymbolTableItem lvsti = null;
+            while(lvsti == null) {
+                try {
+                    lvsti = (LocalVariableSymbolTableItem) xx.get("var_" + name);
+                    if (lvsti.getIndex() <= var_index) {
+
+                    } else {
+                        lvsti = null;
+                        throw new Exception();
+                    }
+                } catch (Exception e) {
+                    xx = xx.getPreSymbolTable();
+                }
+            }
+            return lvsti;
+        } catch (Exception exception) { // it's a field
+            try {
+                SymbolTable xx = SymbolTable.top();
+                String z = "var_" + name;
+                boolean f = false;
+                FieldSymbolTableItem field_item = null;
+                while(field_item == null){
+                    try{
+                        field_item = (FieldSymbolTableItem) xx.get("var_" + name);
+                    }catch (Exception e){
+                        xx = xx.getPreSymbolTable();
+                    }
+                }
+                return field_item;
+            } catch (Exception e) {
+                //Field call is being handled in it's node, if there is no a.b we assume it was variable we were searching for
+                //System.out.println("error about couldn't finding variable or field"); // not sure which error to emit
+            }
+        }
+        return null;
     }
 
     public Void visit(Plus plusExpr) {
@@ -262,6 +306,9 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Equals equalsExpr) {
+//        equalsExpr.getLhs().accept(this);
+//        equalsExpr.getRhs().accept(this);
+
         return null;
     }
 
@@ -337,6 +384,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(MethodCall methodCall) {
         // getting the refrence
+
         for (Expression expression : methodCall.getArgs())
             expression.accept(this);
         append_command("invokevirtual " + methodCall);
@@ -344,6 +392,30 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Identifier identifier) {
+        try {
+            VarSymbolTableItem variableSymbol = find_var_or_field(identifier.getName());
+            SymbolTable xx = SymbolTable.top();
+            try {
+                int var_index = ((LocalVariableSymbolTableItem) variableSymbol).getIndex(); // if it is variable
+                Type var_type = variableSymbol.getType();
+                if( (var_type instanceof IntType) || (var_type instanceof BoolType)){
+                    append_command("iload_" + var_index);
+                }else{
+                    append_command("aload_" + var_index);
+                }
+
+            }catch (Exception e){ // it is field
+                Type var_type = variableSymbol.getType();
+                if( (var_type instanceof IntType) || (var_type instanceof BoolType)){
+                    append_command("getfield" + current_class + "/" + identifier.getName() + " I");
+                }else{
+                    //ObjectReference package.ClassName -> Lpackage.ClassName;
+                    // Array of type a -> [a
+                }
+            }
+        }catch (Exception e){
+
+        }
         return null;
     }
 
@@ -393,7 +465,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     // Statement
     public Void visit(PrintLine printStat) {
-        Type type = printStat.getArg().accept(expressionTypeExtractor);
+        Type type = printStat.getArg().accept(expressionTypeExtractor); // TODO: their code is returning wrong type!!!!
         append_command("getstatic java/lang/System/out Ljava/io/PrintStream;");
         if ( type instanceof IntType) {
             printStat.getArg().accept(this);
@@ -403,6 +475,7 @@ public class CodeGenrator extends Visitor<Void> {
             printStat.getArg().accept(this);
             append_command("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
         }
+        //TODO ARRAY TYPE
 
         return null;
     }
@@ -414,7 +487,8 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(Block block) {
         SymbolTable.pushFromQueue();
-        //
+        for (Statement stmt : block.body)
+            stmt.accept(this);
         SymbolTable.pop();
         return null;
     }
@@ -450,9 +524,19 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(LocalVarDef localVarDef) {
+        var_index++;
         try{
-            LocalVariableSymbolTableItem lvsti= (LocalVariableSymbolTableItem) SymbolTable.top().get(localVarDef.getLocalVarName().getName());
-            curr_var  = lvsti.getIndex() + 1;
+            Type init_val_type = localVarDef.getInitialValue().accept(expressionTypeExtractor);
+            //SymbolTable xx = SymbolTable.top();
+            LocalVariableSymbolTableItem lvsti= (LocalVariableSymbolTableItem) SymbolTable.top().get("var_"+localVarDef.getLocalVarName().getName()); // You had forgotten "var_" prefix. check other places too
+            curr_var  = lvsti.getIndex();
+            localVarDef.getInitialValue().accept(this); // PUSH init value to store
+
+            if(init_val_type instanceof IntType || init_val_type instanceof BoolType){
+                append_command("istore_"+curr_var);
+            }else{
+                append_command("astore_"+curr_var);
+            }
         }
         catch(ItemNotFoundException itfe){}
         return null;
@@ -487,6 +571,8 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        append_runner_class(entryClassDeclaration.getName().getName());
+
         tabs_before = 0;
         current_class = entryClassDeclaration.getName().getName();
         create_class_file(entryClassDeclaration.getName().getName());
@@ -512,10 +598,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(ParameterDeclaration parameterDeclaration) {
+        var_index++;
         return null;
     }
 
     public Void visit(MethodDeclaration methodDeclaration) {
+        var_index = 0;
         SymbolTable.pushFromQueue();
         String static_keyword = " ";
         if (methodDeclaration.getName().getName().equals("main"))
