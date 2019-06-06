@@ -463,6 +463,9 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(NotEquals notEquals) {
+        notEquals.getLhs().accept(this);
+        notEquals.getRhs().accept(this);
+        append_command("if_icmpeq " + String.valueOf(unique_label) + "_else");
         return null;
     }
 
