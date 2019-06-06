@@ -20,7 +20,9 @@ import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
 import toorla.symbolTable.exceptions.ItemNotFoundException;
+import toorla.symbolTable.symbolTableItem.varItems.FieldSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 import toorla.typeChecker.ExpressionTypeExtractor;
 import toorla.types.Type;
 import toorla.types.arrayType.ArrayType;
@@ -30,7 +32,6 @@ import toorla.types.singleType.StringType;
 import toorla.types.singleType.UserDefinedType;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
-import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -47,6 +48,8 @@ public class CodeGenrator extends Visitor<Void> {
     static int unique_label = 0;
     static int curr_var = 0;
     static boolean is_using_self = false;
+    private int var_index = 0;
+
     ExpressionTypeExtractor expressionTypeExtractor;
 //    public PrintWriter printWriter;
     int tabs_before;
@@ -175,6 +178,47 @@ public class CodeGenrator extends Visitor<Void> {
             out.println(command);
         } catch (IOException e) {
         }
+    }
+
+
+    public VarSymbolTableItem find_var_or_field(String name){
+        try {
+            SymbolTable xx = SymbolTable.top();
+            LocalVariableSymbolTableItem lvsti = null;
+            while(lvsti == null) {
+                try {
+                    lvsti = (LocalVariableSymbolTableItem) xx.get("var_" + name);
+                    if (lvsti.getIndex() <= var_index) {
+
+                    } else {
+                        lvsti = null;
+                        throw new Exception();
+                    }
+                } catch (Exception e) {
+                    xx = xx.getPreSymbolTable();
+                }
+            }
+            return lvsti;
+        } catch (Exception exception) { // it's a field
+            try {
+                SymbolTable xx = SymbolTable.top();
+                String z = "var_" + name;
+                boolean f = false;
+                FieldSymbolTableItem field_item = null;
+                while(field_item == null){
+                    try{
+                        field_item = (FieldSymbolTableItem) xx.get("var_" + name);
+                    }catch (Exception e){
+                        xx = xx.getPreSymbolTable();
+                    }
+                }
+                return field_item;
+            } catch (Exception e) {
+                //Field call is being handled in it's node, if there is no a.b we assume it was variable we were searching for
+                //System.out.println("error about couldn't finding variable or field"); // not sure which error to emit
+            }
+        }
+        return null;
     }
 
     public Void visit(Plus plusExpr) {
@@ -307,8 +351,8 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(Identifier identifier) {
         try {
+            VarSymbolTableItem variableSymbol = find_var_or_field(identifier.getName());
             SymbolTable xx = SymbolTable.top();
-            VarSymbolTableItem variableSymbol = ((VarSymbolTableItem) SymbolTable.top().get(VarSymbolTableItem.var_modifier + identifier.getName()));
             try {
                 int var_index = ((LocalVariableSymbolTableItem) variableSymbol).getIndex(); // if it is variable
                 Type var_type = variableSymbol.getType();
@@ -319,9 +363,13 @@ public class CodeGenrator extends Visitor<Void> {
                 }
 
             }catch (Exception e){ // it is field
-
-                append_command("getfield" + current_class + "/" + identifier.getName());
-
+                Type var_type = variableSymbol.getType();
+                if( (var_type instanceof IntType) || (var_type instanceof BoolType)){
+                    append_command("getfield" + current_class + "/" + identifier.getName() + " I");
+                }else{
+                    //ObjectReference package.ClassName -> Lpackage.ClassName;
+                    // Array of type a -> [a
+                }
             }
         }catch (Exception e){
 
@@ -375,7 +423,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     // Statement
     public Void visit(PrintLine printStat) {
-        Type type = printStat.getArg().accept(expressionTypeExtractor);
+        Type type = printStat.getArg().accept(expressionTypeExtractor); // TODO: their code is returning wrong type!!!!
         append_command("getstatic java/lang/System/out Ljava/io/PrintStream;");
         if ( type instanceof IntType) {
             printStat.getArg().accept(this);
@@ -397,7 +445,8 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(Block block) {
         SymbolTable.pushFromQueue();
-        //
+        for (Statement stmt : block.body)
+            stmt.accept(this);
         SymbolTable.pop();
         return null;
     }
@@ -433,6 +482,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(LocalVarDef localVarDef) {
+        var_index++;
         try{
             Type init_val_type = localVarDef.getInitialValue().accept(expressionTypeExtractor);
             //SymbolTable xx = SymbolTable.top();
@@ -506,10 +556,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(ParameterDeclaration parameterDeclaration) {
+        var_index++;
         return null;
     }
 
     public Void visit(MethodDeclaration methodDeclaration) {
+        var_index = 0;
         SymbolTable.pushFromQueue();
         String static_keyword = " ";
         if (methodDeclaration.getName().getName().equals("main"))
