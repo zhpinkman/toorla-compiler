@@ -3,4 +3,8 @@ entry class Sample2 :
         print("Hello World!");
         return 0;
     end
+    function f2() returns int :
+        var a = main();
+        return 0;
+    end
 end

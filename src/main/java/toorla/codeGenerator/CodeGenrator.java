@@ -46,7 +46,6 @@ public class CodeGenrator extends Visitor<Void> {
     static int unique_label = 0;
     static int curr_var = 0;
     static boolean is_using_self = false;
-    static String class_with_main = "";
     ExpressionTypeExtractor expressionTypeExtractor;
 //    public PrintWriter printWriter;
     int tabs_before;
@@ -58,8 +57,8 @@ public class CodeGenrator extends Visitor<Void> {
             return "private";
     }
 
-    public void append_runner_class(){
-        try(FileWriter fw = new FileWriter("artifact/" + "Runner" + ".j", true);
+    public void append_runner_class(String entry_class_name){
+        try(FileWriter fw = new FileWriter("artifact/" + "Runner" + ".j", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {
@@ -74,12 +73,12 @@ public class CodeGenrator extends Visitor<Void> {
                     ".method public static main([Ljava/lang/String;)V\n" +
                     ".limit stack 1000\n" +
                     ".limit locals 100\n" +
-                    "new " + class_with_main + "\n" +
+                    "new " + entry_class_name + "\n" +
                     "dup\n" +
-                    "invokespecial " + class_with_main + "/<init>()V\n" +
+                    "invokespecial " + entry_class_name + "/<init>()V\n" +
                     "astore_1\n" +
                     "aload 1\n" +
-                    "invokestatic " + class_with_main + "/main()I\n" +
+                    "invokestatic " + entry_class_name + "/main()I\n" +
                     "istore_0\n" +
                     "return\n" +
                     ".end method");
@@ -112,7 +111,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void append_limits(){
-        append_command(".limit locals 10"); // TODO local variables should be counted for this part
+        append_command(".limit locals 10"); // TODO local variables should be counted for this part // Just make it big enough
         append_command(".limit stack 100");
     }
 
@@ -125,7 +124,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void create_class_file(String class_name){
-        try(FileWriter fw = new FileWriter("artifact/" + class_name + ".j", true);
+        try(FileWriter fw = new FileWriter("artifact/" + class_name + ".j", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {} catch (IOException e) {
@@ -134,7 +133,7 @@ public class CodeGenrator extends Visitor<Void> {
 
 
     public void create_Any_class(){
-        try(FileWriter fw = new FileWriter("artifact/" + "Any" + ".j", true);
+        try(FileWriter fw = new FileWriter("artifact/" + "Any" + ".j", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw)) {
             out.print(".class public Any\n" +
@@ -295,6 +294,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(MethodCall methodCall) {
         // getting the refrence
+
         for (Expression expression : methodCall.getArgs())
             expression.accept(this);
         append_command("invokevirtual " + methodCall);
@@ -445,6 +445,8 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        append_runner_class(entryClassDeclaration.getName().getName());
+
         tabs_before = 0;
         current_class = entryClassDeclaration.getName().getName();
         create_class_file(entryClassDeclaration.getName().getName());
