@@ -49,6 +49,7 @@ public class CodeGenrator extends Visitor<Void> {
     static int unique_label = 0;
     static int curr_var = 0;
     static boolean is_using_self = false;
+    boolean want_lhs = false;
 
     ExpressionTypeExtractor expressionTypeExtractor;
 //    public PrintWriter printWriter;
@@ -445,6 +446,16 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(ArrayCall arrayCall) {
+        arrayCall.getInstance().accept(this);
+        arrayCall.getIndex().accept(this);
+        if(want_lhs == false){
+            Type array_type = ((ArrayType)arrayCall.getInstance().accept(expressionTypeExtractor)).getSingleType();
+            if(array_type instanceof IntType) {
+                append_command("iaload");
+            }else{
+                append_command("aaload");
+            }
+        }
         return null;
     }
 
@@ -474,6 +485,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(Assign assignStat) {
         //VarSymbolTableItem lhs_symbol_table = find_var_or_field(assignStat.getLvalue().ac);
+        Type var_type = assignStat.getRvalue().accept(expressionTypeExtractor);
         if(assignStat.getLvalue() instanceof  Identifier){ // Variable Or Self field
             String lval_name = ((Identifier) assignStat.getLvalue()).getName();
             VarSymbolTableItem variableSymbol = null;
@@ -483,7 +495,7 @@ public class CodeGenrator extends Visitor<Void> {
             } catch (ItemNotFoundException e) {
                 e.printStackTrace();
             }
-            Type var_type = assignStat.getRvalue().accept(expressionTypeExtractor);
+
 
             if(variableSymbol instanceof  LocalVariableSymbolTableItem){ //VARIABLE
                 assignStat.getRvalue().accept(this);
@@ -499,6 +511,15 @@ public class CodeGenrator extends Visitor<Void> {
             }
 
         }else if(assignStat.getLvalue() instanceof  ArrayCall){ // array[10]
+            want_lhs = true;
+            assignStat.getLvalue().accept(this); // push array ref and index
+            want_lhs = false;
+            assignStat.getRvalue().accept(this); // Push value to store
+            if(var_type instanceof IntType || var_type instanceof BoolType) {
+                append_command("iastore");
+            }else{
+                append_command("aastore");
+            }
 
         }else if(assignStat.getLvalue() instanceof  FieldCall){ // FieldCall
 

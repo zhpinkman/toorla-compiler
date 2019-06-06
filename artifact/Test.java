@@ -4,7 +4,7 @@ public class Test {
     public int a;
     public void main(String[] var0) {
         int[] a = new int[20];
-        a[1] = 22;
+        a[1] = a[5];
         //System.out.println(a);
     }
 }
