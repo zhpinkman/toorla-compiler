@@ -38,6 +38,7 @@ import java.util.ArrayList;
 
 public class CodeGenrator extends Visitor<Void> {
 
+    static int loop_depth = 0;
     static String PUBLIC_ACCESS = "(ACCESS_MODIFIER_PUBLIC)";
     static String PRIVATE_ACCESS = "(ACCESS_MODIFIER_PRIVATE)";
     static String current_class = "";
@@ -53,6 +54,41 @@ public class CodeGenrator extends Visitor<Void> {
     ExpressionTypeExtractor expressionTypeExtractor;
 //    public PrintWriter printWriter;
     int tabs_before;
+
+
+    public void copy_jasmin_file(){
+
+
+        InputStream inStream = null;
+        OutputStream outStream = null;
+
+        try{
+
+            File afile =new File("jasmin.jar");
+            File bfile =new File("artifact/jasmin.jar");
+
+            inStream = new FileInputStream(afile);
+            outStream = new FileOutputStream(bfile);
+
+            byte[] buffer = new byte[1024];
+
+            int length;
+            //copy the file content in bytes
+            while ((length = inStream.read(buffer)) > 0){
+
+                outStream.write(buffer, 0, length);
+
+            }
+
+            inStream.close();
+            outStream.close();
+
+            System.out.println("File is copied successful!");
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
 
     public String make_type_signature(Type t){
         if(t instanceof IntType){
@@ -283,17 +319,24 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Equals equalsExpr) {
-//        equalsExpr.getLhs().accept(this);
-//        equalsExpr.getRhs().accept(this);
-
+        equalsExpr.getLhs().accept(this);
+        equalsExpr.getRhs().accept(this);
+        append_command("if_icmpne " + String.valueOf(unique_label) + "_else");
         return null;
     }
 
     public Void visit(GreaterThan gtExpr) {
+        gtExpr.getLhs().accept(this);
+        gtExpr.getRhs().accept(this);
+        append_command("if_icmple " + String.valueOf(unique_label) + "_else");
+
         return null;
     }
 
     public Void visit(LessThan lessThanExpr) {
+        lessThanExpr.getLhs().accept(this);
+        lessThanExpr.getRhs().accept(this);
+        append_command("if_icmpge " + String.valueOf(unique_label) + "_else");
         return null;
     }
 
@@ -436,6 +479,9 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(NotEquals notEquals) {
+        notEquals.getLhs().accept(this);
+        notEquals.getRhs().accept(this);
+        append_command("if_icmpeq " + String.valueOf(unique_label) + "_else");
         return null;
     }
 
@@ -493,10 +539,27 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Conditional conditional) {
+        conditional.getCondition().accept(this);
+
+        conditional.getThenStatement().accept(this);
+        append_command("goto " + String.valueOf(unique_label) + "_exit");
+
+        append_command(String.valueOf(unique_label) + "_else : ");
+        conditional.getElseStatement().accept(this);
+
+        append_command(String.valueOf(unique_label) + "_exit : ");
+
+        unique_label ++;
         return null;
     }
 
     public Void visit(While whileStat) {
+        loop_depth ++;
+        append_command("continue_" + String.valueOf(loop_depth) + " : ");
+        whileStat.expr.accept(this);
+        whileStat.body.accept(this);
+        append_command("break_" + String.valueOf(loop_depth) + " : ");
+        loop_depth --;
         return null;
     }
 
@@ -591,7 +654,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(FieldDeclaration fieldDeclaration) {
-        append_command(".field " + fieldDeclaration.getAccessModifier().toString() + " " + fieldDeclaration.getIdentifier().getName() + " "
+        append_command(".field " + get_access_modifier(fieldDeclaration.getAccessModifier().toString()) + " " + fieldDeclaration.getIdentifier().getName() + " "
                 + get_type_code(fieldDeclaration.getType()));
         return null;
     }
