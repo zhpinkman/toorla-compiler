@@ -136,7 +136,7 @@ public class CodeGenrator extends Visitor<Void> {
                     "invokespecial " + entry_class_name + "/<init>()V\n" +
                     "astore_1\n" +
                     "aload 1\n" +
-                    "invokestatic " + entry_class_name + "/main()I\n" +
+                    "invokevirtual " + entry_class_name + "/main()I\n" +
                     "istore_0\n" +
                     "return\n" +
                     ".end method");
@@ -671,8 +671,8 @@ public class CodeGenrator extends Visitor<Void> {
 
         SymbolTable.pushFromQueue();
         String static_keyword = " ";
-        if (methodDeclaration.getName().getName().equals("main"))
-            static_keyword = " static";
+//        if (methodDeclaration.getName().getName().equals("main"))
+//            static_keyword = " static";
         String arg_defs = get_args_code(methodDeclaration.getArgs());
         String access = get_access_modifier(methodDeclaration.getAccessModifier().toString());
         append_command(".method " + access + static_keyword + " " +  methodDeclaration.getName().getName() + "(" +

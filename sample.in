@@ -1,13 +1,8 @@
 entry class Test :
     public field yyy int;
     function main() returns int :
-        var a = "aaa";
         yyy = 20;
-        //print(yyy);
-        begin
-            print(a);
-            var a = 5;
-        end
+        print(yyy);
         return 0;
     end
 end
