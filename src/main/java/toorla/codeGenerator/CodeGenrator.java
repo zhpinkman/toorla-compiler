@@ -32,12 +32,6 @@ import toorla.types.singleType.StringType;
 import toorla.types.singleType.UserDefinedType;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -590,6 +584,8 @@ public class CodeGenrator extends Visitor<Void> {
 
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
+        ArrayList<ClassMemberDeclaration> fields = new ArrayList<>();
+        ArrayList<ClassMemberDeclaration> methods = new ArrayList<>();
         tabs_before = 0;
         current_class = classDeclaration.getName().getName();
         create_class_file(classDeclaration.getName().getName());
@@ -601,9 +597,18 @@ public class CodeGenrator extends Visitor<Void> {
             append_command(".super " + classDeclaration.getParentName().getName());
         tabs_before ++;
         append_default_constructor();
+
         for (ClassMemberDeclaration classMemberDeclaration : classDeclaration.getClassMembers()){
-            classMemberDeclaration.accept(this);
+            if (classMemberDeclaration instanceof FieldDeclaration)
+                fields.add(classMemberDeclaration);
+            else if (classMemberDeclaration instanceof MethodDeclaration)
+                methods.add(classMemberDeclaration);
         }
+        for (ClassMemberDeclaration field : fields)
+            field.accept(this);
+        for (ClassMemberDeclaration method : methods)
+            method.accept(this);
+
         SymbolTable.pop();
         return null;
     }
