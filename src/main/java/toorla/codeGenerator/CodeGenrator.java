@@ -144,6 +144,7 @@ public class CodeGenrator extends Visitor<Void> {
                     "invokespecial java/lang/Object/<init>()V\n" +
                     "return\n" +
                     ".end method\n");
+            //
         }catch (Exception exception){}
     }
 
