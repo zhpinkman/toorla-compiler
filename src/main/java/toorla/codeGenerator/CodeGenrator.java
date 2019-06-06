@@ -54,6 +54,25 @@ public class CodeGenrator extends Visitor<Void> {
 //    public PrintWriter printWriter;
     int tabs_before;
 
+    public String make_type_signature(Type t){
+        if(t instanceof IntType){
+            return "I";
+        }
+        if(t instanceof BoolType){
+            return "Z";
+        }
+        if(t instanceof StringType){
+            return "Ljava/lang/String;";
+        }
+        if(t instanceof ArrayType){
+            return "[" + make_type_signature(((ArrayType) t).getSingleType()); //SingleType may not work properly
+        }
+        if(t instanceof UserDefinedType){
+            return "L" + ((UserDefinedType) t).getClassDeclaration().getName().getName() +";";
+        }
+        return "";
+    }
+
     public String get_access_modifier(String access_modifier){
         if (access_modifier.equals(PUBLIC_ACCESS))
             return "public";
@@ -364,13 +383,9 @@ public class CodeGenrator extends Visitor<Void> {
 
             }catch (Exception e){ // it is field
                 Type var_type = variableSymbol.getType();
-                if( (var_type instanceof IntType) || (var_type instanceof BoolType)){
-                    append_command("aload_0"); // push self as obj ref
-                    append_command("getfield" + current_class + "/" + identifier.getName() + " I");
-                }else{
-                    //TODO: ObjectReference package.ClassName -> Lpackage.ClassName;
-                    // Array of type a -> [a
-                }
+                append_command("aload_0"); // push self as obj ref
+                append_command("getfield " + current_class + "/" + identifier.getName() + " " + make_type_signature(var_type));
+
             }
         }catch (Exception e){
 
@@ -444,10 +459,26 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(Assign assignStat) {
         //VarSymbolTableItem lhs_symbol_table = find_var_or_field(assignStat.getLvalue().ac);
         if(assignStat.getLvalue() instanceof  Identifier){ // Variable Or Self field
+            String lval_name = ((Identifier) assignStat.getLvalue()).getName();
+            VarSymbolTableItem variableSymbol = find_var_or_field(lval_name);
+            Type var_type = assignStat.getRvalue().accept(expressionTypeExtractor);
 
-        }else if(assignStat.getLvalue() instanceof  ArrayCall){ // array[10] or field
+            if(variableSymbol instanceof  LocalVariableSymbolTableItem){ //VARIABLE
+                assignStat.getRvalue().accept(this);
+                if(var_type instanceof IntType || var_type instanceof BoolType) {
+                    append_command("istore_" + ((LocalVariableSymbolTableItem) variableSymbol).getIndex());
+                }else{
+                    append_command("astore_" + ((LocalVariableSymbolTableItem) variableSymbol).getIndex());
+                }
+            }else if(variableSymbol instanceof FieldSymbolTableItem){ //SELF FIELD
+                append_command("aload_0"); // Push this as obj ref
+                assignStat.getRvalue().accept(this); // Push value to store
+                append_command( "putfield " + current_class + "/" + lval_name + " " +  make_type_signature(var_type) );
+            }
 
-        }else if(assignStat.getLvalue() instanceof  FieldCall){
+        }else if(assignStat.getLvalue() instanceof  ArrayCall){ // array[10]
+
+        }else if(assignStat.getLvalue() instanceof  FieldCall){ // FieldCall
 
         }
         return null;
