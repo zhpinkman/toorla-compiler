@@ -306,9 +306,9 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Equals equalsExpr) {
-//        equalsExpr.getLhs().accept(this);
-//        equalsExpr.getRhs().accept(this);
-
+        equalsExpr.getLhs().accept(this);
+        equalsExpr.getRhs().accept(this);
+        append_command("if_icmpne " + String.valueOf(unique_label) + "_else");
         return null;
     }
 
@@ -504,7 +504,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Conditional conditional) {
-        conditional.getCondition().accept(this); // label for if and else is also generated here and would be same for other steps
+        conditional.getCondition().accept(this);
 
         conditional.getThenStatement().accept(this);
         append_command("goto " + String.valueOf(unique_label) + "_exit");
@@ -514,6 +514,7 @@ public class CodeGenrator extends Visitor<Void> {
 
         append_command(String.valueOf(unique_label) + "_exit : ");
 
+        unique_label ++;
         return null;
     }
 
