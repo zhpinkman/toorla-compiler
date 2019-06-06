@@ -30,6 +30,7 @@ import toorla.types.singleType.StringType;
 import toorla.types.singleType.UserDefinedType;
 import toorla.utilities.graph.Graph;
 import toorla.visitor.Visitor;
+import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -305,6 +306,26 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Identifier identifier) {
+        try {
+            SymbolTable xx = SymbolTable.top();
+            VarSymbolTableItem variableSymbol = ((VarSymbolTableItem) SymbolTable.top().get(VarSymbolTableItem.var_modifier + identifier.getName()));
+            try {
+                int var_index = ((LocalVariableSymbolTableItem) variableSymbol).getIndex(); // if it is variable
+                Type var_type = variableSymbol.getType();
+                if( (var_type instanceof IntType) || (var_type instanceof BoolType)){
+                    append_command("iload_" + var_index);
+                }else{
+                    append_command("aload_" + var_index);
+                }
+
+            }catch (Exception e){ // it is field
+
+                append_command("getfield" + current_class + "/" + identifier.getName());
+
+            }
+        }catch (Exception e){
+
+        }
         return null;
     }
 
@@ -416,7 +437,7 @@ public class CodeGenrator extends Visitor<Void> {
             Type init_val_type = localVarDef.getInitialValue().accept(expressionTypeExtractor);
             //SymbolTable xx = SymbolTable.top();
             LocalVariableSymbolTableItem lvsti= (LocalVariableSymbolTableItem) SymbolTable.top().get("var_"+localVarDef.getLocalVarName().getName()); // You had forgotten "var_" prefix. check other places too
-            curr_var  = lvsti.getIndex() + 1;
+            curr_var  = lvsti.getIndex();
             localVarDef.getInitialValue().accept(this); // PUSH init value to store
 
             if(init_val_type instanceof IntType || init_val_type instanceof BoolType){

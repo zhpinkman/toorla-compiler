@@ -207,6 +207,8 @@ public class ExpressionTypeExtractor extends Visitor<Type> {
     @Override
     public Type visit(Identifier identifier) {
         try {
+            //SymbolTable xx = SymbolTable.top();
+            //VarSymbolTableItem xxx = ((VarSymbolTableItem) SymbolTable.top().get(VarSymbolTableItem.var_modifier + identifier.getName()));
             return ((VarSymbolTableItem) SymbolTable.top().get(VarSymbolTableItem.var_modifier + identifier.getName()))
                     .getType();
         } catch (ItemNotFoundException variableNotDeclared) {
