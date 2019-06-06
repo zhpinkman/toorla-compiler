@@ -1,8 +1,15 @@
 entry class Test :
-    //public field yyy int;
+    public field yyy int;
     function main() returns int :
-        if (true && false)
-            print(2);
+        //var a = new int[10];
+        //var i = 2;
+        //a[i] = i;
+        //print(a[i]);
+
+        var c = new Test();
+        c.yyy = 3;
+        print(c.yyy);
+
         return 0;
     end
 end
