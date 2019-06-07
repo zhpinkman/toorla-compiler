@@ -433,7 +433,6 @@ public class CodeGenrator extends Visitor<Void> {
         else if (newArray.getType() instanceof UserDefinedType)
             append_command("anewarray " + ((UserDefinedType) newArray.getType()).getClassDeclaration().getName().getName());
 
-        // TODO storing array in locals
         return null;
     }
 
@@ -514,7 +513,11 @@ public class CodeGenrator extends Visitor<Void> {
             printStat.getArg().accept(this);
             append_command("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
         }
-        //TODO ARRAY TYPE
+        else if(type instanceof ArrayType){
+            printStat.getArg().accept(this);
+            append_command("invokestatic java/util/Arrays/toString([Ljava/lang/Object;)Ljava/lang/String;");
+            append_command("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
+        }
 
         return null;
     }
