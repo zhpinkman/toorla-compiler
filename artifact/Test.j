@@ -26,7 +26,7 @@
       iastore
       getstatic java/lang/System/out Ljava/io/PrintStream;
       aload_1
-      invokestatic java/util/Arrays/toString([Ljava/lang/Object;)Ljava/lang/String;
+      invokestatic java/util/Arrays/toString([I)Ljava/lang/String;
       invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
       ldc 0
       ireturn
