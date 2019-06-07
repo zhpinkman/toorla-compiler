@@ -676,14 +676,15 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(While whileStat) {
         SymbolTable.pushFromQueue();
         loop_depth ++;
-        append_command("continue_" + loop_depth + " : ");
+        int old_loop = loop_depth;
+        append_command("continue_" + old_loop + " : ");
 
         whileStat.expr.accept(this);
-        append_command("ifeq " + "break_" + loop_depth);
+        append_command("ifeq " + "break_" + old_loop);
 
         whileStat.body.accept(this);
-        append_command("goto " + "continue_" + loop_depth);
-        append_command("break_" + loop_depth + " : ");
+        append_command("goto " + "continue_" + old_loop);
+        append_command("break_" + old_loop + " : ");
 
         loop_depth --;
         SymbolTable.pop();
