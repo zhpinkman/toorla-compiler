@@ -1,8 +1,8 @@
 entry class Test :
     public field yyy int;
     function main() returns int :
-        var a = "zz";
-        var b = "zzy";
+        var a = ;
+        var b = "zz";
         if(a == b)
             print(1);
         else

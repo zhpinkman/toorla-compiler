@@ -686,7 +686,6 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("goto " + "continue_" + old_loop);
         append_command("break_" + old_loop + " : ");
 
-        loop_depth --;
         SymbolTable.pop();
         return null;
     }
