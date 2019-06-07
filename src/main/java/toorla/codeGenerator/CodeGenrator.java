@@ -639,11 +639,16 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Conditional conditional) {
+        SymbolTable.pushFromQueue();
         conditional.getCondition().accept(this);
 
         append_command("ifeq " + "L" + unique_label + "_else");
 
         conditional.getThenStatement().accept(this);
+
+        SymbolTable.pop();
+        SymbolTable.pushFromQueue();
+
         append_command("goto " + "L" + unique_label + "_exit");
 
         append_command("L" + unique_label + "_else : ");
@@ -651,11 +656,13 @@ public class CodeGenrator extends Visitor<Void> {
 
         append_command("L" + unique_label + "_exit : ");
 
+        SymbolTable.pop();
         unique_label ++;
         return null;
     }
 
     public Void visit(While whileStat) {
+        SymbolTable.pushFromQueue();
         loop_depth ++;
         append_command("continue_" + loop_depth + " : ");
 
@@ -667,6 +674,7 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("break_" + loop_depth + " : ");
 
         loop_depth --;
+        SymbolTable.pop();
         return null;
     }
 

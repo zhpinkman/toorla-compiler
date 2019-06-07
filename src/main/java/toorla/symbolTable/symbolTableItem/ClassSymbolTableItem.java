@@ -7,6 +7,15 @@ public class ClassSymbolTableItem extends SymbolTableItem {
     public static final String classModifier = "class_";
     private SymbolTable symbolTable;
     private SymbolTable parentSymbolTable;
+    private int length;
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length){
+        this.length = length;
+    }
 
     public ClassSymbolTableItem(String name) {
         this.name = name;
