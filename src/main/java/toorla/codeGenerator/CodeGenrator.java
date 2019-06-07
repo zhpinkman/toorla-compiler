@@ -502,14 +502,8 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(NotEquals notEquals) {
-        notEquals.getLhs().accept(this);
-        notEquals.getRhs().accept(this);
-        append_command("if_icmpeq " + "L" + unique_label + "_0");
-        append_command("iconst_1");
-        append_command("goto " + "L" + unique_label + "_exit");
-        append_command("L" + unique_label + "_0 : " + "iconst_0");
-        append_command("L" + unique_label + "_exit : ");
-        unique_label ++;
+        Not not = new Not(new Equals(notEquals.getLhs(), notEquals.getRhs()));
+        not.accept(this);
         return null;
     }
 
