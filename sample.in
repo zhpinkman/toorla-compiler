@@ -1,11 +1,9 @@
 entry class Test :
     public field yyy int;
     function main() returns int :
-        var x = new int[3];
-        x[0] = 0;
-        x[1] = 1;
-        x[2] = 2;
-        print(x);
+        var x = new Test();
+        self.yyy = 3;
+        print(yyy);
         return 0;
     end
 end

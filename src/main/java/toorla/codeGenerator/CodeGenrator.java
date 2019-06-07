@@ -433,6 +433,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Self self) {
+        append_command("aload_0");
         return null;
     }
 
@@ -579,16 +580,15 @@ public class CodeGenrator extends Visitor<Void> {
             assignStat.getRvalue().accept(this); // Push value to store
 
             String fieldName = fieldCall.getField().getName();
-            UserDefinedType class_type = (UserDefinedType) (fieldCall.getInstance().accept(expressionTypeExtractor));
-            String class_name = class_type.getClassDeclaration().getName().getName();
-            FieldSymbolTableItem field_symbol = null;
-            try {
-                ClassSymbolTableItem class_symbol = (ClassSymbolTableItem) SymbolTable.top().get("class_" + class_name);
-                field_symbol = (FieldSymbolTableItem) class_symbol.getSymbolTable().get("var_" + fieldName);
-            }catch (Exception e){
-
+            Expression instance_class = fieldCall.getInstance();
+            String class_name = "";
+            if(fieldCall.getInstance() instanceof Self){
+                class_name = current_class;
+            }else {
+                UserDefinedType class_type = (UserDefinedType) (instance_class.accept(expressionTypeExtractor));
+                class_name = class_type.getClassDeclaration().getName().getName();
             }
-            Type field_type = field_symbol.getFieldType();
+            Type field_type = assignStat.getRvalue().accept(expressionTypeExtractor);
             if(want_lhs == false){
                 append_command("putfield " + class_name + "/" + fieldName + " " + make_type_signature(field_type));
             }
