@@ -2,11 +2,12 @@ entry class Test :
     public field yyy int;
     function main() returns int :
         var x = 2;
-        var y = 3;
-        if(x == y)
-            x = 4;
-        else
-            y = 5;
-        return 0;
+        while ( x <> 4 )
+            print(x);
+            x = x + 1;
     end
+end
+
+
+class zz :
 end

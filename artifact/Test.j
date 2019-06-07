@@ -11,23 +11,27 @@
       .limit stack 100
       ldc 2
       istore_1
-      ldc 3
-      istore_2
+      continue_1 : 
       iload_1
-      iload_2
+      ldc 4
       if_icmpne L0_0
       iconst_1
       goto L0_exit
       L0_0 : iconst_0
       L0_exit : 
-      if_eq L1_else
-      ldc 4
-      istore_1
+      ifne L1_0
+      iconst_1
       goto L1_exit
-      L1_else : 
-      ldc 5
-      istore_2
+      L1_0: iconst_0
       L1_exit : 
-      ldc 0
-      ireturn
+      if_eq break_1
+      getstatic java/lang/System/out Ljava/io/PrintStream;
+      iload_1
+      invokevirtual java/io/PrintStream/println(I)V
+      goto continue_1
+      break_1 : 
+      ldc 1
+      iload_1
+      iadd
+      istore_1
    .end method

@@ -622,6 +622,7 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("if_eq " + "break_" + loop_depth);
 
         whileStat.body.accept(this);
+        append_command("goto " + "continue_" + loop_depth);
         append_command("break_" + loop_depth + " : ");
 
         loop_depth --;
