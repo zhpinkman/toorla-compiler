@@ -282,6 +282,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(Equals equalsExpr) {
         int old_label = unique_label;
+        unique_label ++;
         equalsExpr.getLhs().accept(this);
         equalsExpr.getRhs().accept(this);
         Type type = equalsExpr.getLhs().accept(expressionTypeExtractor);
@@ -303,13 +304,14 @@ public class CodeGenrator extends Visitor<Void> {
             append_command("invokevirtual java/util/Arrays.equals:([Ljava/lang/Object;[Ljava/lang/Object;)Z");
         }
 
-        unique_label ++;
+
 
         return null;
     }
 
     public Void visit(GreaterThan gtExpr) {
         int old_label = unique_label;
+        unique_label ++;
         gtExpr.getLhs().accept(this);
         gtExpr.getRhs().accept(this);
         append_command("if_icmple " + "L" + old_label + "_0");
@@ -318,12 +320,13 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("L" + old_label + "_0 : ");
         append_command("iconst_0");
         append_command("L" + old_label + "_exit : ");
-        unique_label ++;
+
         return null;
     }
 
     public Void visit(LessThan lessThanExpr) {
         int old_label = unique_label;
+        unique_label ++;
         lessThanExpr.getLhs().accept(this);
         lessThanExpr.getRhs().accept(this);
         append_command("if_icmpge " + "L" + old_label + "_0");
@@ -332,12 +335,13 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("L" + old_label + "_0 : ");
         append_command("iconst_0");
         append_command("L" + old_label + "_exit : ");
-        unique_label ++;
+
         return null;
     }
 
     public Void visit(And andExpr) {
         int old_label = unique_label;
+        unique_label ++;
         andExpr.getLhs().accept(this);
 
         append_command("ifeq " + "L" + old_label + "_0");
@@ -354,13 +358,14 @@ public class CodeGenrator extends Visitor<Void> {
 
         append_command("L" + old_label + "_exit : ");
 
-        unique_label ++;
+
         return null;
     }
 
     public Void visit(Or orExpr) {
 
         int old_label = unique_label;
+        unique_label ++;
         orExpr.getLhs().accept(this);
 
         append_command("ifne " + "L" + old_label + "_1");
@@ -378,7 +383,7 @@ public class CodeGenrator extends Visitor<Void> {
 
         append_command("L" + old_label + "_exit : ");
 
-        unique_label ++;
+
         return null;
     }
 
@@ -392,6 +397,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(Not notExpr) {
         int old_label = unique_label;
+        unique_label ++;
         notExpr.getExpr().accept(this);
         append_command("ifne " + "L" + old_label + "_0");
         append_command("iconst_1");
@@ -400,7 +406,7 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("L" + old_label + "_0 : ");
         append_command("iconst_0");
         append_command("L" + old_label + "_exit : ");
-        unique_label ++;
+
         return null;
     }
 
@@ -645,6 +651,7 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(Conditional conditional) {
         int old_label = unique_label;
+        unique_label ++;
         SymbolTable.pushFromQueue();
         conditional.getCondition().accept(this);
 
@@ -663,7 +670,6 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("L" + old_label + "_exit : ");
 
         SymbolTable.pop();
-        unique_label ++;
         return null;
     }
 
