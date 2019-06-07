@@ -121,11 +121,11 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void append_runner_class(String entry_class_name){
-        try(FileWriter fw = new FileWriter("artifact/" + "Runner" + ".j", false);
+        try(FileWriter fw = new FileWriter("artifact/" + "Run$ner" + ".j", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {
-            out.print(".class public Runner\n" +
+            out.print(".class public Run$ner\n" +
                     ".super java/lang/Object\n" +
                     ".method public <init>()V\n" +
                     "aload_0\n" +
