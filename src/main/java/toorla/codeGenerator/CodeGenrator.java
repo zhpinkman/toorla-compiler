@@ -37,9 +37,11 @@ import toorla.visitor.Visitor;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class CodeGenrator extends Visitor<Void> {
 
+    static Stack<Integer> loop_stack;
     static int loop_depth = 0;
     static String PUBLIC_ACCESS = "(ACCESS_MODIFIER_PUBLIC)";
     static String PRIVATE_ACCESS = "(ACCESS_MODIFIER_PRIVATE)";
@@ -218,7 +220,9 @@ public class CodeGenrator extends Visitor<Void> {
         }
     }
 
+
     public CodeGenrator(Graph<String> classHierarchy){
+        loop_stack = new Stack<Integer>();
         expressionTypeExtractor = new ExpressionTypeExtractor(classHierarchy);
         tabs_before = 0;
         create_directory();
@@ -674,9 +678,11 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(While whileStat) {
+
         SymbolTable.pushFromQueue();
         loop_depth ++;
         int old_loop = loop_depth;
+        loop_stack.push(old_loop);
         append_command("continue_" + old_loop + " : ");
 
         whileStat.expr.accept(this);
@@ -687,6 +693,7 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("break_" + old_loop + " : ");
 
         SymbolTable.pop();
+        loop_stack.pop();
         return null;
     }
 
@@ -701,12 +708,12 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Break breakStat) {
-        append_command("goto " + "break_" +  loop_depth);
+        append_command("goto " + "break_" +  loop_stack.peek());
         return null;
     }
 
     public Void visit(Continue continueStat) {
-        append_command("goto " + "continue_" + loop_depth);
+        append_command("goto " + "continue_" + loop_stack.peek());
         return null;
     }
 
