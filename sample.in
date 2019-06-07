@@ -1,15 +1,12 @@
 entry class Test :
     public field yyy int;
     function main() returns int :
-        //var a = new int[10];
-        //var i = 2;
-        //a[i] = i;
-        //print(a[i]);
-
-        var c = new Test();
-        c.yyy = 3;
-        print(c.yyy);
-
+        var x = 2;
+        var y = 3;
+        if(x == y)
+            x = 4;
+        else
+            y = 5;
         return 0;
     end
 end

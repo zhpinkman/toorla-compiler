@@ -600,7 +600,7 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(Conditional conditional) {
         conditional.getCondition().accept(this);
 
-        append_command("if_icmpne " + "L" + unique_label + "_else");
+        append_command("if_eq " + "L" + unique_label + "_else");
 
         conditional.getThenStatement().accept(this);
         append_command("goto " + "L" + unique_label + "_exit");
@@ -619,7 +619,7 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("continue_" + loop_depth + " : ");
 
         whileStat.expr.accept(this);
-        append_command("if_icmpne " + "break_" + loop_depth);
+        append_command("if_eq " + "break_" + loop_depth);
 
         whileStat.body.accept(this);
         append_command("break_" + loop_depth + " : ");
