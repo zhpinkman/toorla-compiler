@@ -21,6 +21,7 @@ import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
 import toorla.symbolTable.exceptions.ItemNotFoundException;
 import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.MethodSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.FieldSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
@@ -400,10 +401,38 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(MethodCall methodCall) {
         // getting the refrence
+        methodCall.getInstance().accept(this); //Push Refrence
 
         for (Expression expression : methodCall.getArgs())
             expression.accept(this);
-//        append_command("invokevirtual " + methodCall);
+
+        String class_name = "";
+        if(methodCall.getInstance() instanceof Self){
+            class_name = current_class;
+        }else {
+            UserDefinedType class_type = (UserDefinedType) (methodCall.getInstance().accept(expressionTypeExtractor));
+            class_name = class_type.getClassDeclaration().getName().getName();
+        }
+
+        String method_name = methodCall.getMethodName().getName();
+        String args_string="";
+        String return_string="";
+        try {
+            SymbolTable xx = SymbolTable.top();
+            ClassSymbolTableItem csti = (ClassSymbolTableItem) SymbolTable.top().get("class_"+class_name);
+            MethodSymbolTableItem msti = (MethodSymbolTableItem) csti.getSymbolTable().get("method_"+method_name);
+            for (Type t:
+                 msti.getArgumentsTypes()) {
+                args_string = args_string + make_type_signature(t);
+            }
+            return_string = make_type_signature(msti.getReturnType());
+        } catch (ItemNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+
+        append_command("invokevirtual " + class_name + "/" + method_name + "("+args_string+")" + return_string);
         return null;
     }
 
@@ -479,18 +508,23 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(FieldCall fieldCall) {
         fieldCall.getInstance().accept(this); //Class accepts and pushes it's refrence
         String fieldName = fieldCall.getField().getName();
-        UserDefinedType class_type = (UserDefinedType) (fieldCall.getInstance().accept(expressionTypeExtractor));
-        String class_name = class_type.getClassDeclaration().getName().getName();
-        FieldSymbolTableItem field_symbol = null;
-        try {
-            ClassSymbolTableItem class_symbol = (ClassSymbolTableItem) SymbolTable.top().get("class_" + class_name);
-            field_symbol = (FieldSymbolTableItem) class_symbol.getSymbolTable().get("var_" + fieldName);
-        }catch (Exception e){
+        Type instance_type = fieldCall.getInstance().accept(expressionTypeExtractor);
+        if(instance_type instanceof ArrayType){
 
-        }
-        Type field_type = field_symbol.getFieldType();
-        if(want_lhs == false){
-            append_command("getfield " + class_name + "/" + fieldName + " " + make_type_signature(field_type));
+        }else {
+            UserDefinedType class_type = (UserDefinedType) (fieldCall.getInstance().accept(expressionTypeExtractor));
+            String class_name = class_type.getClassDeclaration().getName().getName();
+            FieldSymbolTableItem field_symbol = null;
+            try {
+                ClassSymbolTableItem class_symbol = (ClassSymbolTableItem) SymbolTable.top().get("class_" + class_name);
+                field_symbol = (FieldSymbolTableItem) class_symbol.getSymbolTable().get("var_" + fieldName);
+            } catch (Exception e) {
+
+            }
+            Type field_type = field_symbol.getFieldType();
+            if (want_lhs == false) {
+                append_command("getfield " + class_name + "/" + fieldName + " " + make_type_signature(field_type));
+            }
         }
         return null;
     }
@@ -698,6 +732,8 @@ public class CodeGenrator extends Visitor<Void> {
 
     // declarations
     public Void visit(ClassDeclaration classDeclaration) {
+        expressionTypeExtractor.setCurrentClass(classDeclaration);
+
         ArrayList<ClassMemberDeclaration> fields = new ArrayList<>();
         ArrayList<ClassMemberDeclaration> methods = new ArrayList<>();
         tabs_before = 0;
@@ -729,6 +765,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        expressionTypeExtractor.setCurrentClass(entryClassDeclaration);
         ArrayList<ClassMemberDeclaration> fields = new ArrayList<>();
         ArrayList<ClassMemberDeclaration> methods = new ArrayList<>();
         append_runner_class(entryClassDeclaration.getName().getName());
@@ -775,6 +812,10 @@ public class CodeGenrator extends Visitor<Void> {
 
     public Void visit(MethodDeclaration methodDeclaration) {
         SymbolTable.reset();
+        for (ParameterDeclaration p:
+                methodDeclaration.getArgs()) {
+            p.accept(this);
+        }
 
         SymbolTable.pushFromQueue();
         String static_keyword = " ";
@@ -791,6 +832,9 @@ public class CodeGenrator extends Visitor<Void> {
         }
         tabs_before --;
         append_command(".end method");
+
+
+
         SymbolTable.pop();
         return null;
     }

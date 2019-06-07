@@ -1,10 +1,13 @@
 entry class Test :
     public field yyy int;
     function main() returns int :
-        var x = new Test();
-        self.yyy = 3;
-        print(yyy);
+        var a = new int[10];
+        print(f(a, "Mohsen", true, self));
         return 0;
+    end
+    function f(a:int[], b:string, c:bool, t:Test) returns int:
+        print(a);
+        return 33;
     end
 end
 
