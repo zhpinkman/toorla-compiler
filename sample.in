@@ -1,12 +1,14 @@
 entry class Test :
     public field yyy int;
     function main() returns int :
-        var a = ;
-        var b = "zz";
+        var a = new Test();
+        var b = new Test();
+        b = a;
         if(a == b)
             print(1);
         else
             print(2);
+            return 0;
     end
 end
 

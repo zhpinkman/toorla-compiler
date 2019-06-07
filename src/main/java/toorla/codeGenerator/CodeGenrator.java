@@ -301,7 +301,7 @@ public class CodeGenrator extends Visitor<Void> {
             append_command("invokevirtual java/lang/Object.equals(Ljava/lang/Object;)Z");
         }
         else if(type instanceof ArrayType){
-            append_command("invokevirtual java/util/Arrays.equals([Ljava/lang/Object;[Ljava/lang/Object;)Z");
+            append_command("invokestatic java/util/Arrays.equals(" + make_type_signature(type) + make_type_signature(type) + ")Z");
         }
 
 
