@@ -2,7 +2,7 @@ entry class Test :
     public field yyy int;
     function main() returns int :
         var a = new int[10];
-        print(f(a, "Mohsen", true, self));
+        print(a.length);
         return 0;
     end
     function f(a:int[], b:string, c:bool, t:Test) returns int:

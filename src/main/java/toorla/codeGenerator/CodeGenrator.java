@@ -510,7 +510,7 @@ public class CodeGenrator extends Visitor<Void> {
         String fieldName = fieldCall.getField().getName();
         Type instance_type = fieldCall.getInstance().accept(expressionTypeExtractor);
         if(instance_type instanceof ArrayType){
-
+            append_command("arraylength");
         }else {
             UserDefinedType class_type = (UserDefinedType) (fieldCall.getInstance().accept(expressionTypeExtractor));
             String class_name = class_type.getClassDeclaration().getName().getName();
