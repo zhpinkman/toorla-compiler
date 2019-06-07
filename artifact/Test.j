@@ -9,31 +9,25 @@
    .method public  main()I
       .limit locals 10
       .limit stack 100
-      ldc 2
-      istore_1
-      continue_1 : 
-      iload_1
-      ldc 4
-      if_icmpne L0_0
-      iconst_1
-      goto L0_exit
-      L0_0 : 
-      iconst_0
-      L0_exit : 
-      ifne L1_0
-      iconst_1
-      goto L1_exit
-      L1_0 : 
-      iconst_0
-      L1_exit : 
-      ifeq break_1
-      iload_1
+      ldc 3
+      newarray int
+      astore_1
+      aload_1
+      ldc 0
+      ldc 0
+      iastore
+      aload_1
       ldc 1
-      iadd
-      istore_1
-      goto continue_1
-      break_1 : 
+      ldc 1
+      iastore
+      aload_1
+      ldc 2
+      ldc 2
+      iastore
       getstatic java/lang/System/out Ljava/io/PrintStream;
-      iload_1
-      invokevirtual java/io/PrintStream/println(I)V
+      aload_1
+      invokestatic java/util/Arrays/toString([Ljava/lang/Object;)Ljava/lang/String;
+      invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+      ldc 0
+      ireturn
    .end method
