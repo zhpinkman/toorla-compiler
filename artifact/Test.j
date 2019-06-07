@@ -9,17 +9,25 @@
    .method public  main()I
       .limit locals 10
       .limit stack 100
-      new Test
-      dup
-      invokespecial Test/<init>()V
-      astore_1
-      aload_0
       ldc 3
-      putfield Test/yyy I
+      newarray int
+      astore_1
+      aload_1
+      ldc 0
+      ldc 0
+      iastore
+      aload_1
+      ldc 1
+      ldc 1
+      iastore
+      aload_1
+      ldc 2
+      ldc 2
+      iastore
       getstatic java/lang/System/out Ljava/io/PrintStream;
-      aload_0
-      getfield Test/yyy I
-      invokevirtual java/io/PrintStream/println(I)V
+      aload_1
+      invokestatic java/util/Arrays/toString([I)Ljava/lang/String;
+      invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
       ldc 0
       ireturn
    .end method
