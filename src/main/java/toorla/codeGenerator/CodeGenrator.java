@@ -282,12 +282,24 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(Equals equalsExpr) {
         equalsExpr.getLhs().accept(this);
         equalsExpr.getRhs().accept(this);
+        Type type = equalsExpr.getLhs().accept(expressionTypeExtractor);
+        if (type instanceof IntType || type instanceof BoolType){
+            append_command("if_icmpne " + "L" + unique_label + "_0");
+            append_command("iconst_1");
+            append_command("goto " + "L" + unique_label + "_exit");
+            append_command("L" + unique_label + "_0 : " + "iconst_0");
+            append_command("L" + unique_label + "_exit : ");
+        }
+        else if(type instanceof StringType){
+            append_command("invokevirtual java/lang/String.equals:(Ljava/lang/Object;)Z");
+        }
+        else if(type instanceof UserDefinedType){
+            append_command("invokevirtual java/lang/Object.equals:(Ljava/lang/Object;)Z");
+        }
+        else if(type instanceof ArrayType){
+            append_command("invokevirtual java/util/Arrays.equals:([Ljava/lang/Object;[Ljava/lang/Object;)Z");
+        }
 
-        append_command("if_icmpne " + "L" + unique_label + "_0");
-        append_command("iconst_1");
-        append_command("goto " + "L" + unique_label + "_exit");
-        append_command("L" + unique_label + "_0 : " + "iconst_0");
-        append_command("L" + unique_label + "_exit : ");
         unique_label ++;
 
         return null;
@@ -384,7 +396,7 @@ public class CodeGenrator extends Visitor<Void> {
 
         for (Expression expression : methodCall.getArgs())
             expression.accept(this);
-        append_command("invokevirtual " + methodCall);
+//        append_command("invokevirtual " + methodCall);
         return null;
     }
 
