@@ -1,16 +1,12 @@
 entry class Test :
     public field yyy int;
     function main() returns int :
-        var a = new int[10];
-        print(a.length);
-        return 0;
-    end
-    function f(a:int[], b:string, c:bool, t:Test) returns int:
-        print(a);
-        return 33;
+        var a = "zz";
+        var b = "zzy";
+        if(a == b)
+            print(1);
+        else
+            print(2);
     end
 end
 
-
-class zz :
-end

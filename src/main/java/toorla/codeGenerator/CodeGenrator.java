@@ -295,13 +295,13 @@ public class CodeGenrator extends Visitor<Void> {
             append_command("L" + old_label + "_exit : ");
         }
         else if(type instanceof StringType){
-            append_command("invokevirtual java/lang/String.equals:(Ljava/lang/Object;)Z");
+            append_command("invokevirtual java/lang/String.equals(Ljava/lang/Object;)Z");
         }
         else if(type instanceof UserDefinedType){
-            append_command("invokevirtual java/lang/Object.equals:(Ljava/lang/Object;)Z");
+            append_command("invokevirtual java/lang/Object.equals(Ljava/lang/Object;)Z");
         }
         else if(type instanceof ArrayType){
-            append_command("invokevirtual java/util/Arrays.equals:([Ljava/lang/Object;[Ljava/lang/Object;)Z");
+            append_command("invokevirtual java/util/Arrays.equals([Ljava/lang/Object;[Ljava/lang/Object;)Z");
         }
 
 
