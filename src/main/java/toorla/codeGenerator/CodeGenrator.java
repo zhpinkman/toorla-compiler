@@ -287,7 +287,8 @@ public class CodeGenrator extends Visitor<Void> {
             append_command("if_icmpne " + "L" + unique_label + "_0");
             append_command("iconst_1");
             append_command("goto " + "L" + unique_label + "_exit");
-            append_command("L" + unique_label + "_0 : " + "iconst_0");
+            append_command("L" + unique_label + "_0 : ");
+            append_command("iconst_0");
             append_command("L" + unique_label + "_exit : ");
         }
         else if(type instanceof StringType){
@@ -311,7 +312,8 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("if_icmple " + "L" + unique_label + "_0");
         append_command("iconst_1");
         append_command("goto " + "L" + unique_label + "_exit");
-        append_command("L" + unique_label + "_0 : " + "iconst_0");
+        append_command("L" + unique_label + "_0 : ");
+        append_command("iconst_0");
         append_command("L" + unique_label + "_exit : ");
         unique_label ++;
         return null;
@@ -323,7 +325,8 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("if_icmpge " + "L" + unique_label + "_0");
         append_command("iconst_1");
         append_command("goto " + "L" + unique_label + "_exit");
-        append_command("L" + unique_label + "_0 : " + "iconst_0");
+        append_command("L" + unique_label + "_0 : ");
+        append_command("iconst_0");
         append_command("L" + unique_label + "_exit : ");
         unique_label ++;
         return null;
@@ -341,7 +344,8 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("iconst_1");
         append_command("goto " + "L" + unique_label + "_exit");
 
-        append_command("L" + unique_label + "_0: " + "iconst_0");
+        append_command("L" + unique_label + "_0 : ");
+        append_command("iconst_0");
 
         append_command("L" + unique_label + "_exit : ");
 
@@ -359,10 +363,12 @@ public class CodeGenrator extends Visitor<Void> {
 
         append_command("ifeq " + "L" + unique_label + "_0");
 
-        append_command("L" + unique_label + "_1: " + "iconst_1");
+        append_command("L" + unique_label + "_1 : ");
+        append_command("iconst_1");
         append_command("goto " + "L" + unique_label + "_exit");
 
-        append_command("L" + unique_label + "_0: " + "iconst_0");
+        append_command("L" + unique_label + "_0 : ");
+        append_command("iconst_0");
 
         append_command("L" + unique_label + "_exit : ");
 
@@ -385,7 +391,8 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("iconst_1");
         append_command("goto " + "L" + unique_label + "_exit");
 
-        append_command("L" + unique_label + "_0: " + "iconst_0");
+        append_command("L" + unique_label + "_0 : ");
+        append_command("iconst_0");
         append_command("L" + unique_label + "_exit : ");
         unique_label ++;
         return null;

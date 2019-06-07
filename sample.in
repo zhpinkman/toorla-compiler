@@ -3,8 +3,10 @@ entry class Test :
     function main() returns int :
         var x = 2;
         while ( x <> 4 )
+        begin
             print(x);
             x = x + 1;
+        end
     end
 end
 
