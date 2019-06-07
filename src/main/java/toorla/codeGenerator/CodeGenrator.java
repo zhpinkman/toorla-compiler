@@ -238,8 +238,8 @@ public class CodeGenrator extends Visitor<Void> {
 
 
     public Void visit(Plus plusExpr) {
-        plusExpr.getRhs().accept(this);
         plusExpr.getLhs().accept(this);
+        plusExpr.getRhs().accept(this);
 
         append_command("iadd");
 
@@ -607,7 +607,7 @@ public class CodeGenrator extends Visitor<Void> {
     public Void visit(Conditional conditional) {
         conditional.getCondition().accept(this);
 
-        append_command("if_eq " + "L" + unique_label + "_else");
+        append_command("ifeq " + "L" + unique_label + "_else");
 
         conditional.getThenStatement().accept(this);
         append_command("goto " + "L" + unique_label + "_exit");
@@ -626,7 +626,7 @@ public class CodeGenrator extends Visitor<Void> {
         append_command("continue_" + loop_depth + " : ");
 
         whileStat.expr.accept(this);
-        append_command("if_eq " + "break_" + loop_depth);
+        append_command("ifeq " + "break_" + loop_depth);
 
         whileStat.body.accept(this);
         append_command("goto " + "continue_" + loop_depth);
@@ -739,7 +739,7 @@ public class CodeGenrator extends Visitor<Void> {
         SymbolTable.pushFromQueue();
         append_command(".class public " + entryClassDeclaration.getName().getName());
         if (entryClassDeclaration.getParentName().getName() == null)
-            append_command(".super " +  "Any"); // TODO package for any class should be added before Any keyword
+            append_command(".super " +  "Any");
         else
             append_command(".super " + entryClassDeclaration.getParentName().getName());
         tabs_before ++;
