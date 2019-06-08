@@ -459,9 +459,9 @@ public class CodeGenrator extends Visitor<Void> {
                 int var_index = ((LocalVariableSymbolTableItem) variableSymbol).getIndex(); // if it is variable
                 Type var_type = variableSymbol.getType();
                 if( (var_type instanceof IntType) || (var_type instanceof BoolType)){
-                    append_command("iload_" + var_index);
+                    append_command("iload " + var_index);
                 }else{
-                    append_command("aload_" + var_index);
+                    append_command("aload " + var_index);
                 }
 
             }catch (Exception e){ // it is field
@@ -602,9 +602,9 @@ public class CodeGenrator extends Visitor<Void> {
             if(variableSymbol instanceof  LocalVariableSymbolTableItem){ //VARIABLE
                 assignStat.getRvalue().accept(this);
                 if(var_type instanceof IntType || var_type instanceof BoolType) {
-                    append_command("istore_" + ((LocalVariableSymbolTableItem) variableSymbol).getIndex());
+                    append_command("istore " + ((LocalVariableSymbolTableItem) variableSymbol).getIndex());
                 }else{
-                    append_command("astore_" + ((LocalVariableSymbolTableItem) variableSymbol).getIndex());
+                    append_command("astore " + ((LocalVariableSymbolTableItem) variableSymbol).getIndex());
                 }
             }else if(variableSymbol instanceof FieldSymbolTableItem){ //SELF FIELD
                 append_command("aload_0"); // Push this as obj ref
@@ -731,9 +731,9 @@ public class CodeGenrator extends Visitor<Void> {
             localVarDef.getInitialValue().accept(this); // PUSH init value to store
 
             if(init_val_type instanceof IntType || init_val_type instanceof BoolType){
-                append_command("istore_"+curr_var);
+                append_command("istore "+curr_var);
             }else{
-                append_command("astore_"+curr_var);
+                append_command("astore "+curr_var);
             }
         }
         catch(ItemNotFoundException itfe){}
