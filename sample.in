@@ -1,18 +1,11 @@
 entry class Test :
-    public field yyy int;
+    public field x string;
     function main() returns int :
-        var a = new Test();
-        var b = new Test();
-        var c = 10;
-        b = a;
-        if(a == b)
-        begin
-            print(1);
-            print(10);
-        end
-        else
-            print(2);
-            return 0;
+        print(x);
+        return 0;
     end
 end
 
+
+// a[0].b[0] array call
+// String init

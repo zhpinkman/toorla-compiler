@@ -53,6 +53,7 @@ public class CodeGenrator extends Visitor<Void> {
     static int  unique_label = 0;
     static int curr_var = 0;
     static boolean is_using_self = false;
+    static ArrayList<String> string_fields = new ArrayList<>();
     boolean want_lhs = false;
 
     ExpressionTypeExtractor expressionTypeExtractor;
@@ -179,11 +180,20 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void append_default_constructor(){
+        String string_init = "";
+
         append_command(".method public <init>()V\n" +
                 "       aload_0 ; push this\n" +
-                "       invokespecial java/lang/Object/<init>()V ; call super\n" +
-                "       return\n" +
+                "       invokespecial java/lang/Object/<init>()V ; call super");
+        for (String field : string_fields){
+            append_command("aload_0");
+            append_command("ldc \"\"");
+            append_command("putfield " + current_class + "/" + field + " " + make_type_signature(new StringType()));
+        }
+        append_command("       return\n" +
                 "   .end method");
+        string_fields = new ArrayList<>();
+
     }
 
     public void create_class_file(String class_name){
@@ -545,8 +555,11 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(ArrayCall arrayCall) {
+        boolean old_want_lhs = want_lhs;
+        want_lhs = false;
         arrayCall.getInstance().accept(this);
         arrayCall.getIndex().accept(this);
+        want_lhs = old_want_lhs;
         if(want_lhs == false){
             Type array_type = ((ArrayType)arrayCall.getInstance().accept(expressionTypeExtractor)).getSingleType();
             if(array_type instanceof IntType) {
@@ -829,6 +842,11 @@ public class CodeGenrator extends Visitor<Void> {
         SymbolTable.define();
         append_command(".field " + get_access_modifier(fieldDeclaration.getAccessModifier().toString()) + " " + fieldDeclaration.getIdentifier().getName() + " "
                 + get_type_code(fieldDeclaration.getType()));
+        System.out.println(fieldDeclaration.getType());
+        if(fieldDeclaration.getType().toString().equals("string")){
+            string_fields.add(fieldDeclaration.getIdentifier().getName());
+        }
+
         return null;
     }
 

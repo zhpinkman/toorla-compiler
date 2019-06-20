@@ -133,7 +133,7 @@ public class TypeChecker extends Visitor<Void> {
         if(!TypeChecker.isFirstSubTypeOfSecond(actualReturnedType,formalReturnType,classHierarchy))
             returnStat.addError( new CompileErrorException(
                 String.format("Expression returned by this method " +
-                        "must be %s", actualReturnedType.toString() ) , returnStat.line , returnStat.col ) );
+                        "must be %s", actualReturnedType.toString() ) , returnStat.line , returnStat.col));
         return null;
     }
 
