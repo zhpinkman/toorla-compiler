@@ -127,10 +127,10 @@ public class CodeGenrator extends Visitor<Void> {
             PrintWriter out = new PrintWriter(bw))
         {
             out.print(".class public Run$ner\n" +
-                    ".super java/lang/Object\n" +
+                    ".super Any\n" +
                     ".method public <init>()V\n" +
                     "aload_0\n" +
-                    "invokespecial java/lang/Object/<init>()V\n" +
+                    "invokespecial Any/<init>()V\n" +
                     "return\n" +
                     ".end method\n" +
                     "\n" +
@@ -183,8 +183,10 @@ public class CodeGenrator extends Visitor<Void> {
         String string_init = "";
 
         append_command(".method public <init>()V\n" +
+                "       .limit locals 10\n" +
+                "       .limit stack 100\n" +
                 "       aload_0 ; push this\n" +
-                "       invokespecial java/lang/Object/<init>()V ; call super");
+                "       invokespecial Any/<init>()V ; call super");
         for (String field : string_fields){
             append_command("aload_0");
             append_command("ldc \"\"");

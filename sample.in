@@ -1,6 +1,7 @@
 entry class Test :
     public field x string;
     function main() returns int :
+        x = "zhivar";
         print(x);
         return 0;
     end
