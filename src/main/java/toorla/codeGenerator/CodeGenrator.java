@@ -175,18 +175,18 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void append_limits(){
-        append_command(".limit locals 10"); // TODO local variables should be counted for this part // Just make it big enough
+        append_command(".limit locals 100"); // TODO local variables should be counted for this part // Just make it big enough
         append_command(".limit stack 100");
     }
 
-    public void append_default_constructor(){
+    public void append_default_constructor(String super_class){
         String string_init = "";
 
         append_command(".method public <init>()V\n" +
-                "       .limit locals 10\n" +
+                "       .limit locals 100\n" +
                 "       .limit stack 100\n" +
                 "       aload_0 ; push this\n" +
-                "       invokespecial Any/<init>()V ; call super");
+                "       invokespecial " + super_class + "/<init>()V ; call super");
         for (String field : string_fields){
             append_command("aload_0");
             append_command("ldc \"\"");
@@ -317,7 +317,11 @@ public class CodeGenrator extends Visitor<Void> {
             append_command("invokevirtual java/lang/Object.equals(Ljava/lang/Object;)Z");
         }
         else if(type instanceof ArrayType){
-            append_command("invokestatic java/util/Arrays.equals(" + make_type_signature(type) + make_type_signature(type) + ")Z");
+//            Type inner_type = ((ArrayType) type).getSingleType();
+//            if (inner_type instanceof IntType || inner_type instanceof BoolType)
+//                append_command("invokestatic java/util/Arrays.equals(" + make_type_signature(type) + make_type_signature(type) + ")Z");
+//            else
+            append_command("invokevirtual java/lang/Object.equals(Ljava/lang/Object;)Z");
         }
 
 
@@ -564,11 +568,12 @@ public class CodeGenrator extends Visitor<Void> {
         want_lhs = old_want_lhs;
         if(want_lhs == false){
             Type array_type = ((ArrayType)arrayCall.getInstance().accept(expressionTypeExtractor)).getSingleType();
-            if(array_type instanceof IntType) {
+            if(array_type instanceof IntType)
                 append_command("iaload");
-            }else{
+            else if(array_type instanceof BoolType)
+                append_command("baload");
+            else
                 append_command("aaload");
-            }
         }
         return null;
     }
@@ -632,11 +637,12 @@ public class CodeGenrator extends Visitor<Void> {
             assignStat.getLvalue().accept(this); // push array ref and index
             want_lhs = false;
             assignStat.getRvalue().accept(this); // Push value to store
-            if(var_type instanceof IntType || var_type instanceof BoolType) {
+            if(var_type instanceof IntType)
                 append_command("iastore");
-            }else{
+            else if(var_type instanceof BoolType)
+                append_command("bastore");
+            else
                 append_command("aastore");
-            }
 
         }else if(assignStat.getLvalue() instanceof  FieldCall){ // FieldCall
             FieldCall fieldCall = (FieldCall) assignStat.getLvalue();
@@ -783,10 +789,12 @@ public class CodeGenrator extends Visitor<Void> {
         create_class_file(classDeclaration.getName().getName());
         SymbolTable.pushFromQueue();
         append_command(".class public " + classDeclaration.getName().getName());
-        if (classDeclaration.getParentName().getName() == null)
-            append_command(".super " +  "Any"); // TODO package for any class should be added before Any keyword
+        String super_class = "";
+        if(classDeclaration.getParentName().getName() == null)
+            super_class = "Any";
         else
-            append_command(".super " + classDeclaration.getParentName().getName());
+            super_class = classDeclaration.getParentName().getName();
+        append_command(".super " + super_class);
         tabs_before ++;
 
 
@@ -798,7 +806,7 @@ public class CodeGenrator extends Visitor<Void> {
         }
         for (ClassMemberDeclaration field : fields)
             field.accept(this);
-        append_default_constructor();
+        append_default_constructor(super_class);
         for (ClassMemberDeclaration method : methods)
             method.accept(this);
 
@@ -817,10 +825,12 @@ public class CodeGenrator extends Visitor<Void> {
         create_class_file(entryClassDeclaration.getName().getName());
         SymbolTable.pushFromQueue();
         append_command(".class public " + entryClassDeclaration.getName().getName());
-        if (entryClassDeclaration.getParentName().getName() == null)
-            append_command(".super " +  "Any");
+        String super_class = "";
+        if(entryClassDeclaration.getParentName().getName() == null)
+            super_class = "Any";
         else
-            append_command(".super " + entryClassDeclaration.getParentName().getName());
+            super_class = entryClassDeclaration.getParentName().getName();
+        append_command(".super " + super_class);
         tabs_before ++;
 
         for (ClassMemberDeclaration classMemberDeclaration : entryClassDeclaration.getClassMembers()){
@@ -831,7 +841,7 @@ public class CodeGenrator extends Visitor<Void> {
         }
         for (ClassMemberDeclaration field : fields)
             field.accept(this);
-        append_default_constructor();
+        append_default_constructor(super_class);
         for (ClassMemberDeclaration method : methods)
             method.accept(this);
 
@@ -844,7 +854,7 @@ public class CodeGenrator extends Visitor<Void> {
         SymbolTable.define();
         append_command(".field " + get_access_modifier(fieldDeclaration.getAccessModifier().toString()) + " " + fieldDeclaration.getIdentifier().getName() + " "
                 + get_type_code(fieldDeclaration.getType()));
-        System.out.println(fieldDeclaration.getType());
+//        System.out.println(fieldDeclaration.getType());
         if(fieldDeclaration.getType().toString().equals("string")){
             string_fields.add(fieldDeclaration.getIdentifier().getName());
         }
