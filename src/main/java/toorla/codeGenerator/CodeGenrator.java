@@ -739,6 +739,7 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public Void visit(Skip skip) {
+        append_command("nop");
         return null;
     }
 
@@ -888,6 +889,7 @@ public class CodeGenrator extends Visitor<Void> {
             statement.accept(this);
         }
         tabs_before --;
+        append_command("nop");
         append_command(".end method");
 
 
