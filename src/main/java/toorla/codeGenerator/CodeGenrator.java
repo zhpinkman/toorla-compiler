@@ -122,11 +122,11 @@ public class CodeGenrator extends Visitor<Void> {
     }
 
     public void append_runner_class(String entry_class_name){
-        try(FileWriter fw = new FileWriter("artifact/" + "Run$ner" + ".j", false);
+        try(FileWriter fw = new FileWriter("artifact/" + "_Runner" + ".j", false);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {
-            out.print(".class public Run$ner\n" +
+            out.print(".class public _Runner\n" +
                     ".super Any\n" +
                     ".method public <init>()V\n" +
                     "aload_0\n" +
@@ -311,17 +311,18 @@ public class CodeGenrator extends Visitor<Void> {
             append_command("L" + old_label + "_exit : ");
         }
         else if(type instanceof StringType){
-            append_command("invokevirtual java/lang/String.equals(Ljava/lang/Object;)Z");
+            append_command("invokevirtual java/lang/Object.equals(Ljava/lang/Object;)Z");
         }
         else if(type instanceof UserDefinedType){
             append_command("invokevirtual java/lang/Object.equals(Ljava/lang/Object;)Z");
         }
         else if(type instanceof ArrayType){
-//            Type inner_type = ((ArrayType) type).getSingleType();
-//            if (inner_type instanceof IntType || inner_type instanceof BoolType)
-//                append_command("invokestatic java/util/Arrays.equals(" + make_type_signature(type) + make_type_signature(type) + ")Z");
-//            else
-            append_command("invokevirtual java/lang/Object.equals(Ljava/lang/Object;)Z");
+            Type inner_type = ((ArrayType) type).getSingleType();
+            if (inner_type instanceof IntType || inner_type instanceof BoolType)
+                append_command("invokestatic java/util/Arrays.equals(" + make_type_signature(type) + make_type_signature(type) + ")Z");
+            else
+                append_command("invokestatic java/util/Arrays.equals(" + "[Ljava/lang/Object;" + "[Ljava/lang/Object;" + ")Z");
+//            append_command("invokevirtual java/lang/Object.equals(Ljava/lang/Object;)Z");
         }
 
 
