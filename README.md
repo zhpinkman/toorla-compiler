@@ -11,3 +11,5 @@ Different modules are included in this compiler just like a normal compiler:
 * Type Checker
 * Visitor 
 * Grammar processor
+
+Java, ANTLR, and Jasmin were used in different parts of the project from checking the grammar to generating bytecodes. 
